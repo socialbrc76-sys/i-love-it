@@ -22,7 +22,7 @@ async function renderCarousel(finalData, outputDir) {
 
     const generatedFiles = [];
     const dateStr = finalData.date.replace(/-/g, '');
-    const totalSlides = 10;
+    const totalSlides = 9;
     const dateDisplay = `${finalData.date.substring(5,7)}/${finalData.date.substring(8,10)}`;
 
     async function captureSlide(templateName, injectObj, filename) {
@@ -154,9 +154,54 @@ async function renderCarousel(finalData, outputDir) {
             p4Accent: c4.accent, p4Text: getContrastText(c4.accent),
         }, `${dateStr}_01_cover.png`);
 
-        // ── 2. 타율왕 레이스 (F1 스타일 팀 컬러 + 순위 변동) ──
+        // ── 2. 오늘의 MVP (팀 컬러 + 선수 사진) ──
+        if (mvp) {
+            const mvpTc = getTeamColor(mvp.teamName);
+            const mvpImgUrl = `https://sports-phinf.pstatic.net/player/kbo/default/${mvp.playerCode}.png`;
+            function getTop5Img(p) { return p ? `https://sports-phinf.pstatic.net/player/kbo/default/${p.playerCode}.png` : ''; }
+            function getTop5Color(p) { return p ? getTeamColor(p.teamName).color : '#6366f1'; }
+            await captureSlide('mvp.html', {
+                slideNum: 2,
+                teamName: mvp.teamName, playerName: mvp.playerName,
+                ab: mvp.ab, hit: mvp.hit, hr: mvp.hr, rbi: mvp.rbi, run: mvp.run, mvpScore: mvp.mvpScore,
+                mvpColor: mvpTc.color, mvpImg: mvpImgUrl,
+                r2Name: top5[1] ? top5[1].playerName : '-', r2Score: top5[1] ? top5[1].mvpScore : '-', r2Img: getTop5Img(top5[1]), r2Color: getTop5Color(top5[1]),
+                r3Name: top5[2] ? top5[2].playerName : '-', r3Score: top5[2] ? top5[2].mvpScore : '-', r3Img: getTop5Img(top5[2]), r3Color: getTop5Color(top5[2]),
+                r4Name: top5[3] ? top5[3].playerName : '-', r4Score: top5[3] ? top5[3].mvpScore : '-', r4Img: getTop5Img(top5[3]), r4Color: getTop5Color(top5[3]),
+                r5Name: top5[4] ? top5[4].playerName : '-', r5Score: top5[4] ? top5[4].mvpScore : '-', r5Img: getTop5Img(top5[4]), r5Color: getTop5Color(top5[4]),
+            }, `${dateStr}_02_mvp.png`);
+        }
+
+        // ── 3. MVP 상세 (히어로 스타일 대형 이미지) ──
+        if (mvp) {
+            const mvpTc = getTeamColor(mvp.teamName);
+            const mvpImgUrl = `https://sports-phinf.pstatic.net/player/kbo/default/${mvp.playerCode}.png`;
+            const hexToRgba = (hex, a) => { const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; };
+            let inningItems = '';
+            for (let i = 1; i <= 12; i++) {
+                const key = `inn${i}`;
+                const val = mvp[key];
+                if (val && val.trim() !== '') {
+                    const isHit = val.includes('안') || val.includes('적시');
+                    const isHr = val.includes('홈');
+                    const isBb = val.includes('4구');
+                    const cls = isHr ? 'hr' : isHit ? 'hit' : isBb ? 'bb' : 'out';
+                    inningItems += `<div class="inning-item"><div class="inn">${i}회</div><div class="result ${cls}">${val}</div></div>`;
+                }
+            }
+            if (!inningItems) inningItems = '<div class="inning-item"><div class="inn">-</div><div class="result out">기록 없음</div></div>';
+
+            await captureSlide('mvp-detail.html', {
+                slideNum: 3,
+                playerName: mvp.playerName, teamName: mvp.teamName, mvpScore: mvp.mvpScore,
+                hra: mvp.hra || '-', ab: mvp.ab, hit: mvp.hit, hr: mvp.hr, rbi: mvp.rbi, run: mvp.run,
+                mvpColor: mvpTc.color, mvpColorAlpha: hexToRgba(mvpTc.color, 0.15), mvpImg: mvpImgUrl,
+                inningItems,
+            }, `${dateStr}_03_mvp_detail.png`);
+        }
+
+        // ── 4. 타율왕 레이스 (F1 스타일 팀 컬러 + 순위 변동) ──
         if (br.length >= 4) {
-            // 전날 데이터 로드 (순위 변동 비교용)
             const prevDate = new Date(finalData.date);
             prevDate.setDate(prevDate.getDate() - 1);
             const prevStr = prevDate.toISOString().split('T')[0].replace(/-/g, '');
@@ -182,77 +227,29 @@ async function renderCarousel(finalData, outputDir) {
             const tc1 = getTeamColor(br[0].teamName), tc2 = getTeamColor(br[1].teamName);
             const tc3 = getTeamColor(br[2].teamName), tc4 = getTeamColor(br[3].teamName);
             await captureSlide('batting-race.html', {
-                slideNum: 2,
+                slideNum: 4,
                 t1Name: br[0].playerName, t1Team: br[0].teamName, t1Avg: br[0].avg, t1Ab: br[0].ab, t1Hit: br[0].hit, t1Color: tc1.color, t1TeamShort: tc1.short, t1Change: c1.text, t1ChangeClass: c1.cls, t1Img: br[0].imageUrl,
                 t2Name: br[1].playerName, t2Team: br[1].teamName, t2Avg: br[1].avg, t2Ab: br[1].ab, t2Hit: br[1].hit, t2Color: tc2.color, t2TeamShort: tc2.short, t2Change: c2.text, t2ChangeClass: c2.cls, t2Img: br[1].imageUrl,
                 t3Name: br[2].playerName, t3Team: br[2].teamName, t3Avg: br[2].avg, t3Ab: br[2].ab, t3Hit: br[2].hit, t3Color: tc3.color, t3TeamShort: tc3.short, t3Change: c3.text, t3ChangeClass: c3.cls, t3Img: br[2].imageUrl,
                 t4Name: br[3].playerName, t4Team: br[3].teamName, t4Avg: br[3].avg, t4Ab: br[3].ab, t4Hit: br[3].hit, t4Color: tc4.color, t4TeamShort: tc4.short, t4Change: c4.text, t4ChangeClass: c4.cls, t4Img: br[3].imageUrl,
-            }, `${dateStr}_02_batting.png`);
+            }, `${dateStr}_04_batting.png`);
         }
 
-        // ── 3. 타율왕 상세 2×2 카드 (팀 컬러 + 선수 사진) ──
+        // ── 5. 타율왕 상세 2×2 카드 (팀 컬러 + 선수 사진) ──
         if (br.length >= 4) {
             const tc1 = getTeamColor(br[0].teamName), tc2 = getTeamColor(br[1].teamName);
             const tc3 = getTeamColor(br[2].teamName), tc4 = getTeamColor(br[3].teamName);
             await captureSlide('batting-detail.html', {
-                slideNum: 3,
+                slideNum: 5,
                 t1Name: br[0].playerName, t1Team: br[0].teamName, t1Avg: br[0].avg, t1Hit: br[0].hit, t1Hr: br[0].hr, t1Color: tc1.color, t1TeamShort: tc1.short, t1Img: br[0].imageUrl,
                 t2Name: br[1].playerName, t2Team: br[1].teamName, t2Avg: br[1].avg, t2Hit: br[1].hit, t2Hr: br[1].hr, t2Color: tc2.color, t2TeamShort: tc2.short, t2Img: br[1].imageUrl,
                 t3Name: br[2].playerName, t3Team: br[2].teamName, t3Avg: br[2].avg, t3Hit: br[2].hit, t3Hr: br[2].hr, t3Color: tc3.color, t3TeamShort: tc3.short, t3Img: br[2].imageUrl,
                 t4Name: br[3].playerName, t4Team: br[3].teamName, t4Avg: br[3].avg, t4Hit: br[3].hit, t4Hr: br[3].hr, t4Color: tc4.color, t4TeamShort: tc4.short, t4Img: br[3].imageUrl,
-            }, `${dateStr}_03_batting_detail.png`);
-        }
-
-        // ── 4. 오늘의 MVP (팀 컬러 + 선수 사진) ──
-        if (mvp) {
-            const mvpTc = getTeamColor(mvp.teamName);
-            const mvpImgUrl = `https://sports-phinf.pstatic.net/player/kbo/default/${mvp.playerCode}.png`;
-            function getTop5Img(p) { return p ? `https://sports-phinf.pstatic.net/player/kbo/default/${p.playerCode}.png` : ''; }
-            function getTop5Color(p) { return p ? getTeamColor(p.teamName).color : '#6366f1'; }
-            await captureSlide('mvp.html', {
-                slideNum: 4,
-                teamName: mvp.teamName, playerName: mvp.playerName,
-                ab: mvp.ab, hit: mvp.hit, hr: mvp.hr, rbi: mvp.rbi, run: mvp.run, mvpScore: mvp.mvpScore,
-                mvpColor: mvpTc.color, mvpImg: mvpImgUrl,
-                r2Name: top5[1] ? top5[1].playerName : '-', r2Score: top5[1] ? top5[1].mvpScore : '-', r2Img: getTop5Img(top5[1]), r2Color: getTop5Color(top5[1]),
-                r3Name: top5[2] ? top5[2].playerName : '-', r3Score: top5[2] ? top5[2].mvpScore : '-', r3Img: getTop5Img(top5[2]), r3Color: getTop5Color(top5[2]),
-                r4Name: top5[3] ? top5[3].playerName : '-', r4Score: top5[3] ? top5[3].mvpScore : '-', r4Img: getTop5Img(top5[3]), r4Color: getTop5Color(top5[3]),
-                r5Name: top5[4] ? top5[4].playerName : '-', r5Score: top5[4] ? top5[4].mvpScore : '-', r5Img: getTop5Img(top5[4]), r5Color: getTop5Color(top5[4]),
-            }, `${dateStr}_04_mvp.png`);
-        }
-
-        // ── 5. MVP 상세 (히어로 스타일 대형 이미지) ──
-        if (mvp) {
-            const mvpTc = getTeamColor(mvp.teamName);
-            const mvpImgUrl = `https://sports-phinf.pstatic.net/player/kbo/default/${mvp.playerCode}.png`;
-            // 팀 컬러 알파값 (배경 글로우용)
-            const hexToRgba = (hex, a) => { const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; };
-            let inningItems = '';
-            for (let i = 1; i <= 12; i++) {
-                const key = `inn${i}`;
-                const val = mvp[key];
-                if (val && val.trim() !== '') {
-                    const isHit = val.includes('안') || val.includes('적시');
-                    const isHr = val.includes('홈');
-                    const isBb = val.includes('4구');
-                    const cls = isHr ? 'hr' : isHit ? 'hit' : isBb ? 'bb' : 'out';
-                    inningItems += `<div class="inning-item"><div class="inn">${i}회</div><div class="result ${cls}">${val}</div></div>`;
-                }
-            }
-            if (!inningItems) inningItems = '<div class="inning-item"><div class="inn">-</div><div class="result out">기록 없음</div></div>';
-
-            await captureSlide('mvp-detail.html', {
-                slideNum: 5,
-                playerName: mvp.playerName, teamName: mvp.teamName, mvpScore: mvp.mvpScore,
-                hra: mvp.hra || '-', ab: mvp.ab, hit: mvp.hit, hr: mvp.hr, rbi: mvp.rbi, run: mvp.run,
-                mvpColor: mvpTc.color, mvpColorAlpha: hexToRgba(mvpTc.color, 0.15), mvpImg: mvpImgUrl,
-                inningItems,
-            }, `${dateStr}_05_mvp_detail.png`);
+            }, `${dateStr}_05_batting_detail.png`);
         }
 
         // ── 6. ERA 레이스 (F1 스타일 팀 컬러 + 순위 변동) ──
         if (pr.length >= 4) {
-            // 전날 데이터 로드 (순위 변동 비교용)
             const prevDate = new Date(finalData.date);
             prevDate.setDate(prevDate.getDate() - 1);
             const prevStr = prevDate.toISOString().split('T')[0].replace(/-/g, '');
@@ -307,21 +304,13 @@ async function renderCarousel(finalData, outputDir) {
             n3Headline: n3.headline, n3Summary: `${n3.summary1 || ''} ${n3.summary2 || ''}`,
         }, `${dateStr}_08_hotnews.png`);
 
-        // ── 9. 핫뉴스 상세 ──
-        await captureSlide('hot-news-detail.html', {
-            slideNum: 9,
-            n1Headline: n1.headline, n1Summary: `${n1.summary1 || ''} ${n1.summary2 || ''}`,
-            n2Headline: n2.headline, n2Summary: `${n2.summary1 || ''} ${n2.summary2 || ''}`,
-            n3Headline: n3.headline, n3Summary: `${n3.summary1 || ''} ${n3.summary2 || ''}`,
-        }, `${dateStr}_09_hotnews_detail.png`);
-
-        // ── 10. AI 예측 + CTA ──
+        // ── 9. AI 예측 + CTA ──
         const d = new Date(finalData.date);
         d.setDate(d.getDate() + 1);
         const nextDayStr = `${d.getMonth()+1}/${d.getDate()}(${['일','월','화','수','목','금','토'][d.getDay()]})`;
 
         await captureSlide('ai-predict.html', {
-            slideNum: 10,
+            slideNum: 9,
             nextDate: nextDayStr,
             teamName: ai ? ai.teamName : '분석 대기',
             playerName: ai ? ai.playerName : 'Gemini 연동 후 활성화',
@@ -330,7 +319,7 @@ async function renderCarousel(finalData, outputDir) {
             reason2: ai ? ai.reason2 : '환경변수 GEMINI_API_KEY를 설정해주세요',
             reason3: ai ? ai.reason3 : '.env 파일에 키를 추가해주세요',
             fanComment: ai ? ai.fanComment : '다음 경기도 기대해주세요! ⚾🔥',
-        }, `${dateStr}_10_ai_predict.png`);
+        }, `${dateStr}_09_ai_predict.png`);
 
     } catch (e) {
         console.error("Puppeteer Render Error:", e);

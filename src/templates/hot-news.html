@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>핫뉴스</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;font-family:'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#1a0533 0%,#2d1b69 40%,#1e3a5f 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.page-indicator{position:absolute;top:50px;right:60px;background:rgba(0,0,0,0.5);padding:10px 22px;border-radius:20px;font-size:22px;font-weight:700;z-index:3}
+.header{padding:60px 80px 30px;text-align:center}
+.badge{display:inline-block;background:linear-gradient(135deg,#3b82f6,#6366f1);padding:10px 30px;border-radius:30px;font-size:22px;font-weight:800;margin-bottom:20px}
+.header h1{font-size:60px;font-weight:900}
+.header .sub{font-size:26px;color:#94a3b8;margin-top:8px}
+.news-cards{flex:1;display:flex;flex-direction:column;gap:24px;padding:20px 80px 40px;justify-content:center}
+.news-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px;display:flex;gap:30px;align-items:flex-start}
+.news-num{font-size:48px;font-weight:900;color:#818cf8;min-width:60px}
+.news-body{flex:1}
+.news-body .headline{font-size:34px;font-weight:900;line-height:1.3;margin-bottom:12px}
+.news-body .summary{font-size:22px;color:#94a3b8;line-height:1.5}
+.logo{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);font-size:36px;font-weight:900;letter-spacing:3px;z-index:3}
+.logo { font-family: 'Archivo Black', sans-serif; font-style: italic; }
+.logo span.highlight { color: #c084fc; }
+</style>
+</head>
+<body>
+<div class="page-indicator">{{slideNum}}/{{totalSlides}}</div>
+<div class="header">
+    <div class="badge">📰 오늘의 핫뉴스</div>
+    <h1>KBO 뉴스 TOP 3</h1>
+    <div class="sub">{{dateDisplay}} 가장 뜨거웠던 소식</div>
+</div>
+<div class="news-cards">
+    <div class="news-card">
+        <div class="news-num">1</div>
+        <div class="news-body">
+            <div class="headline">{{n1Headline}}</div>
+            <div class="summary">{{n1Summary}}</div>
+        </div>
+    </div>
+    <div class="news-card">
+        <div class="news-num">2</div>
+        <div class="news-body">
+            <div class="headline">{{n2Headline}}</div>
+            <div class="summary">{{n2Summary}}</div>
+        </div>
+    </div>
+    <div class="news-card">
+        <div class="news-num">3</div>
+        <div class="news-body">
+            <div class="headline">{{n3Headline}}</div>
+            <div class="summary">{{n3Summary}}</div>
+        </div>
+    </div>
+</div>
+<div class="logo">@kbo_data_<span class="highlight">lab</span></div>
+</body>
+</html>

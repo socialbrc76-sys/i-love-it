@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>MVP 상세</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;font-family:'Noto Sans KR',sans-serif;background:linear-gradient(160deg,#070b14 0%,#0f1729 40%,#111827 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+
+/* 뒤쪽에 팀 컬러 글로우 */
+.bg-glow{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0}
+.bg-glow::before{content:'';position:absolute;top:-100px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,var(--team-color-alpha),transparent 70%);border-radius:50%}
+.bg-glow::after{content:'';position:absolute;bottom:0;right:0;width:600px;height:600px;background:radial-gradient(circle,var(--team-color-alpha),transparent 70%);border-radius:50%}
+
+.page-indicator{position:absolute;top:50px;right:60px;background:rgba(0,0,0,0.5);padding:10px 22px;border-radius:20px;font-size:22px;font-weight:700;z-index:3}
+
+/* 히어로 영역: 선수 사진 + 정보 */
+.hero{display:flex;align-items:center;padding:50px 70px 20px;position:relative;z-index:1;gap:35px}
+
+.hero-photo{width:220px;height:220px;border-radius:50%;overflow:hidden;flex-shrink:0;border:5px solid rgba(255,255,255,0.15);background:#1a1a2e;box-shadow:0 0 60px var(--team-color-alpha)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+
+.hero-info{flex:1}
+.hero-info .badge{display:inline-block;background:linear-gradient(135deg,#ef4444,#dc2626);padding:8px 24px;border-radius:24px;font-size:20px;font-weight:800;margin-bottom:12px}
+.hero-info .name{font-size:60px;font-weight:900;line-height:1.1}
+.hero-info .sub{font-size:24px;color:#94a3b8;margin-top:8px}
+.hero-info .mvp-score{display:inline-flex;align-items:baseline;gap:12px;margin-top:14px}
+.hero-info .mvp-score .label{font-size:18px;color:#94a3b8;text-transform:uppercase;letter-spacing:2px}
+.hero-info .mvp-score .num{font-size:64px;font-weight:900;background:linear-gradient(135deg,#fbbf24,#f59e0b);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+
+/* 기록 영역 */
+.detail-area{flex:1;padding:20px 70px;display:flex;flex-direction:column;gap:20px;justify-content:center;position:relative;z-index:1}
+
+.inning-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:25px 35px;position:relative;overflow:hidden}
+.inning-card .team-stripe{position:absolute;left:0;top:0;bottom:0;width:6px}
+.inning-card h3{font-size:26px;font-weight:800;margin-bottom:14px;color:#fbbf24}
+.inning-grid{display:flex;gap:12px;flex-wrap:wrap}
+.inning-item{background:rgba(255,255,255,0.07);border-radius:12px;padding:12px 18px;text-align:center;min-width:90px}
+.inning-item .inn{font-size:15px;color:#94a3b8;margin-bottom:3px}
+.inning-item .result{font-size:20px;font-weight:800}
+.inning-item .result.hit{color:#22c55e}
+.inning-item .result.hr{color:#ef4444}
+.inning-item .result.bb{color:#3b82f6}
+.inning-item .result.out{color:#64748b}
+
+.summary-row{display:flex;gap:14px}
+.summary-box{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:20px;text-align:center}
+.summary-box .label{font-size:16px;color:#94a3b8;margin-bottom:6px}
+.summary-box .val{font-size:38px;font-weight:900}
+.summary-box .val.gold{color:#fbbf24}
+.summary-box .val.red{color:#ef4444}
+.summary-box .val.blue{color:#3b82f6}
+
+.logo{position:absolute;bottom:35px;left:50%;transform:translateX(-50%);font-size:30px;font-weight:900;letter-spacing:3px;z-index:3}
+.logo { font-family: 'Archivo Black', sans-serif; font-style: italic; }
+.logo span.highlight { color: #c084fc; }
+</style>
+</head>
+<body style="--team-color-alpha:{{mvpColorAlpha}}">
+<div class="bg-glow"></div>
+<div class="page-indicator">{{slideNum}}/{{totalSlides}}</div>
+
+<div class="hero">
+    <div class="hero-photo" style="border-color:{{mvpColor}};box-shadow:0 0 60px {{mvpColorAlpha}}"><img src="{{mvpImg}}" alt=""></div>
+    <div class="hero-info">
+        <div class="badge">🔥 MVP 상세 기록</div>
+        <div class="name">{{playerName}}</div>
+        <div class="sub" style="color:{{mvpColor}}">{{teamName}}</div>
+        <div class="mvp-score">
+            <span class="label">MVP Score</span>
+            <span class="num">{{mvpScore}}</span>
+        </div>
+    </div>
+</div>
+
+<div class="detail-area">
+    <div class="inning-card">
+        <div class="team-stripe" style="background:{{mvpColor}}"></div>
+        <h3>⚾ 이닝별 기록</h3>
+        <div class="inning-grid">
+            {{inningItems}}
+        </div>
+    </div>
+    <div class="summary-row">
+        <div class="summary-box"><div class="label">타율</div><div class="val gold">{{hra}}</div></div>
+        <div class="summary-box"><div class="label">타수/안타</div><div class="val">{{ab}}/{{hit}}</div></div>
+        <div class="summary-box"><div class="label">홈런</div><div class="val red">{{hr}}</div></div>
+        <div class="summary-box"><div class="label">타점</div><div class="val blue">{{rbi}}</div></div>
+        <div class="summary-box"><div class="label">득점</div><div class="val">{{run}}</div></div>
+    </div>
+</div>
+<div class="logo">@kbo_data_<span class="highlight">lab</span></div>
+</body>
+</html>

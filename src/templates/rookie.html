@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>루키 스포트라이트</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;font-family:'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#1a0533 0%,#2d1b69 40%,#1e3a5f 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.page-indicator{position:absolute;top:50px;right:60px;background:rgba(0,0,0,0.5);padding:10px 22px;border-radius:20px;font-size:22px;font-weight:700;z-index:3}
+.header{padding:50px 80px 20px;text-align:center}
+.badge{display:inline-block;background:linear-gradient(135deg,#10b981,#059669);padding:10px 30px;border-radius:30px;font-size:22px;font-weight:800;margin-bottom:15px}
+.header h1{font-size:56px;font-weight:900}
+.header .sub{font-size:24px;color:#94a3b8;margin-top:8px}
+.rookies{flex:1;display:flex;flex-direction:column;gap:20px;padding:20px 80px 40px;justify-content:center}
+.rookie-card{display:flex;align-items:center;padding:30px 40px;border-radius:24px;gap:30px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)}
+.rookie-card.first{border:2px solid rgba(16,185,129,0.4);background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.05))}
+.medal{font-size:52px;width:70px;text-align:center}
+.rk-info{flex:1}
+.rk-info .team{font-size:20px;color:#10b981;font-weight:700;margin-bottom:4px}
+.rk-info .name{font-size:38px;font-weight:900}
+.rk-info .note{font-size:18px;color:#94a3b8;margin-top:6px}
+.rk-stats{text-align:right}
+.rk-stats .avg{font-size:44px;font-weight:900}
+.rk-stats .ops{font-size:22px;color:#94a3b8;margin-top:4px}
+.logo{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);font-size:36px;font-weight:900;letter-spacing:3px;z-index:3}
+.logo { font-family: 'Archivo Black', sans-serif; font-style: italic; }
+.logo span.highlight { color: #c084fc; }
+</style>
+</head>
+<body>
+<div class="page-indicator">{{slideNum}}/{{totalSlides}}</div>
+<div class="header">
+    <div class="badge">⭐ 루키 스포트라이트</div>
+    <h1>2026 신인왕 레이스</h1>
+    <div class="sub">프로 무대 적응 현황 Top 3</div>
+</div>
+<div class="rookies">
+    <div class="rookie-card first">
+        <div class="medal">🥇</div>
+        <div class="rk-info">
+            <div class="team">{{r1Team}}</div>
+            <div class="name">{{r1Name}}</div>
+            <div class="note">{{r1Note}}</div>
+        </div>
+        <div class="rk-stats">
+            <div class="avg">{{r1Avg}}</div>
+            <div class="ops">OPS {{r1Ops}}</div>
+        </div>
+    </div>
+    <div class="rookie-card">
+        <div class="medal">🥈</div>
+        <div class="rk-info">
+            <div class="team">{{r2Team}}</div>
+            <div class="name">{{r2Name}}</div>
+            <div class="note">{{r2Note}}</div>
+        </div>
+        <div class="rk-stats">
+            <div class="avg">{{r2Avg}}</div>
+            <div class="ops">OPS {{r2Ops}}</div>
+        </div>
+    </div>
+    <div class="rookie-card">
+        <div class="medal">🥉</div>
+        <div class="rk-info">
+            <div class="team">{{r3Team}}</div>
+            <div class="name">{{r3Name}}</div>
+            <div class="note">{{r3Note}}</div>
+        </div>
+        <div class="rk-stats">
+            <div class="avg">{{r3Avg}}</div>
+            <div class="ops">OPS {{r3Ops}}</div>
+        </div>
+    </div>
+</div>
+<div class="logo">@kbo_data_<span class="highlight">lab</span></div>
+</body>
+</html>

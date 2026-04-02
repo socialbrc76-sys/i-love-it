@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>타율왕 상세</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;font-family:'Noto Sans KR',sans-serif;background:linear-gradient(160deg,#070b14 0%,#0f1729 40%,#111827 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+
+body::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,0.08),transparent 70%);border-radius:50%}
+
+.page-indicator{position:absolute;top:50px;right:60px;background:rgba(0,0,0,0.5);padding:10px 22px;border-radius:20px;font-size:22px;font-weight:700;z-index:3}
+.header{padding:45px 80px 15px;text-align:center;position:relative;z-index:1}
+.badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);padding:10px 30px;border-radius:30px;font-size:22px;font-weight:800;margin-bottom:12px}
+.header h1{font-size:48px;font-weight:900}
+.header .sub{font-size:22px;color:#94a3b8;margin-top:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px 55px;flex:1;align-content:center;position:relative;z-index:1}
+
+/* ── 팀 컬러 카드 ── */
+.player-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:22px;padding:28px 30px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.player-card .team-stripe{position:absolute;left:0;top:0;bottom:0;width:6px}
+.player-card .team-glow{position:absolute;left:0;top:0;bottom:0;width:80px;opacity:0.2}
+
+.player-card.gold{border:2px solid rgba(251,191,36,0.35);background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.03))}
+.player-card .rank-bg{position:absolute;top:12px;right:16px;font-size:72px;font-weight:900;color:rgba(255,255,255,0.04)}
+
+/* 선수 프로필 영역 */
+.player-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;position:relative;z-index:1}
+.player-photo{width:72px;height:72px;border-radius:50%;overflow:hidden;flex-shrink:0;border:3px solid rgba(255,255,255,0.15);background:#1a1a2e}
+.player-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.player-meta .team{font-size:16px;font-weight:700;letter-spacing:2px;margin-bottom:2px}
+.player-meta .name{font-size:34px;font-weight:900;line-height:1.1}
+
+.stat-row{display:flex;gap:10px;position:relative;z-index:1}
+.stat-row .item{flex:1;background:rgba(0,0,0,0.25);border-radius:12px;padding:14px 10px;text-align:center}
+.stat-row .item .label{font-size:13px;color:#94a3b8}
+.stat-row .item .val{font-size:28px;font-weight:900}
+
+.player-card.gold .stat-row .item .val{color:#fbbf24}
+.player-card.gold .player-photo{border-color:rgba(251,191,36,0.5)}
+.player-card:not(.gold) .stat-row .item .val{color:#e2e8f0}
+
+.logo{position:absolute;bottom:35px;left:50%;transform:translateX(-50%);font-size:30px;font-weight:900;letter-spacing:3px;z-index:3}
+.logo { font-family: 'Archivo Black', sans-serif; font-style: italic; }
+.logo span.highlight { color: #c084fc; }
+</style>
+</head>
+<body>
+<div class="page-indicator">{{slideNum}}/{{totalSlides}}</div>
+<div class="header">
+    <div class="badge">🏆 타율왕 상세 카드</div>
+    <h1>시즌 타율 Top 4 상세</h1>
+    <div class="sub">{{dateDisplay}} 기준</div>
+</div>
+<div class="grid">
+    <!-- 1위 -->
+    <div class="player-card gold">
+        <div class="team-stripe" style="background:{{t1Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t1Color}},transparent)"></div>
+        <div class="rank-bg">1</div>
+        <div class="player-header">
+            <div class="player-photo" style="border-color:{{t1Color}}"><img src="{{t1Img}}" alt=""></div>
+            <div class="player-meta">
+                <div class="team" style="color:{{t1Color}}">{{t1Team}}</div>
+                <div class="name">{{t1Name}}</div>
+            </div>
+        </div>
+        <div class="stat-row">
+            <div class="item"><div class="label">타율</div><div class="val">{{t1Avg}}</div></div>
+            <div class="item"><div class="label">안타</div><div class="val">{{t1Hit}}</div></div>
+            <div class="item"><div class="label">홈런</div><div class="val">{{t1Hr}}</div></div>
+        </div>
+    </div>
+    <!-- 2위 -->
+    <div class="player-card">
+        <div class="team-stripe" style="background:{{t2Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t2Color}},transparent)"></div>
+        <div class="rank-bg">2</div>
+        <div class="player-header">
+            <div class="player-photo" style="border-color:{{t2Color}}"><img src="{{t2Img}}" alt=""></div>
+            <div class="player-meta">
+                <div class="team" style="color:{{t2Color}}">{{t2Team}}</div>
+                <div class="name">{{t2Name}}</div>
+            </div>
+        </div>
+        <div class="stat-row">
+            <div class="item"><div class="label">타율</div><div class="val">{{t2Avg}}</div></div>
+            <div class="item"><div class="label">안타</div><div class="val">{{t2Hit}}</div></div>
+            <div class="item"><div class="label">홈런</div><div class="val">{{t2Hr}}</div></div>
+        </div>
+    </div>
+    <!-- 3위 -->
+    <div class="player-card">
+        <div class="team-stripe" style="background:{{t3Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t3Color}},transparent)"></div>
+        <div class="rank-bg">3</div>
+        <div class="player-header">
+            <div class="player-photo" style="border-color:{{t3Color}}"><img src="{{t3Img}}" alt=""></div>
+            <div class="player-meta">
+                <div class="team" style="color:{{t3Color}}">{{t3Team}}</div>
+                <div class="name">{{t3Name}}</div>
+            </div>
+        </div>
+        <div class="stat-row">
+            <div class="item"><div class="label">타율</div><div class="val">{{t3Avg}}</div></div>
+            <div class="item"><div class="label">안타</div><div class="val">{{t3Hit}}</div></div>
+            <div class="item"><div class="label">홈런</div><div class="val">{{t3Hr}}</div></div>
+        </div>
+    </div>
+    <!-- 4위 -->
+    <div class="player-card">
+        <div class="team-stripe" style="background:{{t4Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t4Color}},transparent)"></div>
+        <div class="rank-bg">4</div>
+        <div class="player-header">
+            <div class="player-photo" style="border-color:{{t4Color}}"><img src="{{t4Img}}" alt=""></div>
+            <div class="player-meta">
+                <div class="team" style="color:{{t4Color}}">{{t4Team}}</div>
+                <div class="name">{{t4Name}}</div>
+            </div>
+        </div>
+        <div class="stat-row">
+            <div class="item"><div class="label">타율</div><div class="val">{{t4Avg}}</div></div>
+            <div class="item"><div class="label">안타</div><div class="val">{{t4Hit}}</div></div>
+            <div class="item"><div class="label">홈런</div><div class="val">{{t4Hr}}</div></div>
+        </div>
+    </div>
+</div>
+<div class="logo">@kbo_data_<span class="highlight">lab</span></div>
+</body>
+</html>

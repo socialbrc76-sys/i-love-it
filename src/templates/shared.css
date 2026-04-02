@@ -1,0 +1,110 @@
+/* src/templates/shared.css */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/variable/pretendardvariable.css');
+
+:root {
+    --bg-color: #0f172a; /* Slate 900 */
+    --text-main: #f8fafc;
+    --text-sub: #94a3b8;
+    --accent-color: #818cf8; /* Indigo 400 */
+    --brand-color: #38bdf8; /* Sky 400 */
+    
+    /* 카드 색상 */
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --card-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 1080px;
+    height:1350px;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif;
+    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-color));
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* 상단 헤더 공통 */
+.header {
+    width: 100%;
+    padding: 60px 80px 40px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.header-badge {
+    align-self: flex-start;
+    background: linear-gradient(135deg, var(--brand-color), var(--accent-color));
+    color: white;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.header-title {
+    font-size: 72px;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+.header-subtitle {
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--text-sub);
+    margin-top: 15px;
+}
+
+/* 하단 푸터 공통 */
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 80px;
+    box-sizing: border-box;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    background: linear-gradient(to top, rgba(15,23,42,0.9), transparent);
+}
+
+.footer .brand {
+    font-size: 32px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer .brand span {
+    font-weight: 400;
+    color: var(--text-sub);
+}
+
+.footer .date {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-sub);
+    letter-spacing: 1px;
+}
+
+/* 글래스모피즘 카드 공통 */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}

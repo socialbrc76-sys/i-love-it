@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>타율왕 레이스</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;font-family:'Noto Sans KR',sans-serif;background:linear-gradient(160deg,#070b14 0%,#0f1729 40%,#111827 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+
+body::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,0.08),transparent 70%);border-radius:50%}
+body::after{content:'';position:absolute;bottom:-150px;left:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(245,158,11,0.06),transparent 70%);border-radius:50%}
+
+.page-indicator{position:absolute;top:50px;right:60px;background:rgba(0,0,0,0.5);padding:10px 22px;border-radius:20px;font-size:22px;font-weight:700;z-index:3}
+.header{padding:50px 80px 25px;text-align:center;position:relative;z-index:1}
+.badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);padding:10px 30px;border-radius:30px;font-size:22px;font-weight:800;margin-bottom:15px;letter-spacing:1px}
+.header h1{font-size:54px;font-weight:900;letter-spacing:-1px}
+.header .sub{font-size:22px;color:#94a3b8;margin-top:8px}
+.leaderboard{flex:1;display:flex;flex-direction:column;gap:14px;padding:15px 60px 50px;justify-content:center;position:relative;z-index:1}
+
+.rank-bar{display:flex;align-items:center;border-radius:16px;overflow:hidden;position:relative;height:150px}
+.rank-bar .team-stripe{position:absolute;left:0;top:0;bottom:0;width:8px;z-index:2}
+.rank-bar .team-glow{position:absolute;left:0;top:0;bottom:0;width:120px;opacity:0.25;z-index:0}
+.rank-bar .team-bg{position:absolute;right:0;top:0;bottom:0;width:50%;opacity:0.12;z-index:0}
+.rank-bar .inner{position:relative;z-index:1;display:flex;align-items:center;width:100%;padding:0 30px 0 20px;gap:16px}
+
+.rank-num{font-size:54px;font-weight:900;min-width:68px;text-align:center;opacity:0.9}
+
+/* 선수 얼굴 사진 */
+.player-photo{width:90px;height:90px;border-radius:50%;overflow:hidden;flex-shrink:0;border:3px solid rgba(255,255,255,0.15);position:relative;background:#1a1a2e}
+.player-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+
+.player-info{flex:1}
+.player-info .team-label{font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+.player-info .name{font-size:40px;font-weight:900;letter-spacing:-0.5px}
+
+.stat-area{text-align:right;min-width:170px;display:flex;flex-direction:column;align-items:flex-end}
+.stat-area .avg{font-size:56px;font-weight:900;line-height:1}
+.stat-area .detail{font-size:16px;color:rgba(255,255,255,0.5);margin-top:4px}
+
+.change{position:absolute;top:12px;right:20px;font-size:16px;font-weight:800;padding:4px 12px;border-radius:10px;z-index:2}
+.change.up{color:#22c55e;background:rgba(34,197,94,0.15)}
+.change.down{color:#ef4444;background:rgba(239,68,68,0.15)}
+.change.new{color:#818cf8;background:rgba(129,140,248,0.15)}
+.change.same{color:#94a3b8;background:rgba(148,163,184,0.1)}
+
+.rank-bar.rank1{background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(245,158,11,0.05));border:2px solid rgba(251,191,36,0.3)}
+.rank-bar.rank1 .rank-num{color:#fbbf24}
+.rank-bar.rank1 .stat-area .avg{color:#fbbf24}
+.rank-bar.rank1 .player-photo{border-color:rgba(251,191,36,0.5)}
+
+.rank-bar.rank2,.rank-bar.rank3,.rank-bar.rank4{background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.06)}
+.rank-bar.rank2 .rank-num,.rank-bar.rank3 .rank-num,.rank-bar.rank4 .rank-num{color:rgba(255,255,255,0.45)}
+
+.logo{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:30px;font-weight:900;letter-spacing:3px;z-index:3}
+.logo { font-family: 'Archivo Black', sans-serif; font-style: italic; }
+.logo span.highlight { color: #c084fc; }
+</style>
+</head>
+<body>
+<div class="page-indicator">{{slideNum}}/{{totalSlides}}</div>
+<div class="header">
+    <div class="badge">🏆 타율왕 레이스</div>
+    <h1>가장 매서운 타격감을 뽐내는 타자는?</h1>
+    <div class="sub">{{dateDisplay}} 기준 시즌 누적 타율 Top 4</div>
+</div>
+<div class="leaderboard">
+
+    <div class="rank-bar rank1">
+        <div class="team-stripe" style="background:{{t1Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t1Color}},transparent)"></div>
+        <div class="team-bg" style="background:linear-gradient(90deg,transparent,{{t1Color}})"></div>
+        <div class="change {{t1ChangeClass}}">{{t1Change}}</div>
+        <div class="inner">
+            <div class="rank-num">1</div>
+            <div class="player-photo" style="border-color:{{t1Color}}"><img src="{{t1Img}}" alt=""></div>
+            <div class="player-info">
+                <div class="team-label" style="color:{{t1Color}}">{{t1Team}}</div>
+                <div class="name">{{t1Name}}</div>
+            </div>
+            <div class="stat-area">
+                <div class="avg">{{t1Avg}}</div>
+                <div class="detail">{{t1Ab}}타수 {{t1Hit}}안타</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rank-bar rank2">
+        <div class="team-stripe" style="background:{{t2Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t2Color}},transparent)"></div>
+        <div class="team-bg" style="background:linear-gradient(90deg,transparent,{{t2Color}})"></div>
+        <div class="change {{t2ChangeClass}}">{{t2Change}}</div>
+        <div class="inner">
+            <div class="rank-num">2</div>
+            <div class="player-photo" style="border-color:{{t2Color}}"><img src="{{t2Img}}" alt=""></div>
+            <div class="player-info">
+                <div class="team-label" style="color:{{t2Color}}">{{t2Team}}</div>
+                <div class="name">{{t2Name}}</div>
+            </div>
+            <div class="stat-area">
+                <div class="avg">{{t2Avg}}</div>
+                <div class="detail">{{t2Ab}}타수 {{t2Hit}}안타</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rank-bar rank3">
+        <div class="team-stripe" style="background:{{t3Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t3Color}},transparent)"></div>
+        <div class="team-bg" style="background:linear-gradient(90deg,transparent,{{t3Color}})"></div>
+        <div class="change {{t3ChangeClass}}">{{t3Change}}</div>
+        <div class="inner">
+            <div class="rank-num">3</div>
+            <div class="player-photo" style="border-color:{{t3Color}}"><img src="{{t3Img}}" alt=""></div>
+            <div class="player-info">
+                <div class="team-label" style="color:{{t3Color}}">{{t3Team}}</div>
+                <div class="name">{{t3Name}}</div>
+            </div>
+            <div class="stat-area">
+                <div class="avg">{{t3Avg}}</div>
+                <div class="detail">{{t3Ab}}타수 {{t3Hit}}안타</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rank-bar rank4">
+        <div class="team-stripe" style="background:{{t4Color}}"></div>
+        <div class="team-glow" style="background:linear-gradient(90deg,{{t4Color}},transparent)"></div>
+        <div class="team-bg" style="background:linear-gradient(90deg,transparent,{{t4Color}})"></div>
+        <div class="change {{t4ChangeClass}}">{{t4Change}}</div>
+        <div class="inner">
+            <div class="rank-num">4</div>
+            <div class="player-photo" style="border-color:{{t4Color}}"><img src="{{t4Img}}" alt=""></div>
+            <div class="player-info">
+                <div class="team-label" style="color:{{t4Color}}">{{t4Team}}</div>
+                <div class="name">{{t4Name}}</div>
+            </div>
+            <div class="stat-area">
+                <div class="avg">{{t4Avg}}</div>
+                <div class="detail">{{t4Ab}}타수 {{t4Hit}}안타</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="logo">@kbo_data_<span class="highlight">lab</span></div>
+</body>
+</html>

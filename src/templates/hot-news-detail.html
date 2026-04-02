@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>핫뉴스 상세</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;font-family:'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#1a0533 0%,#2d1b69 40%,#1e3a5f 100%);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.page-indicator{position:absolute;top:50px;right:60px;background:rgba(0,0,0,0.5);padding:10px 22px;border-radius:20px;font-size:22px;font-weight:700;z-index:3}
+.content{width:100%;padding:80px;display:flex;flex-direction:column;gap:50px}
+.news-feature{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:60px;position:relative;overflow:hidden}
+.news-feature::before{content:'';position:absolute;top:-50%;right:-20%;width:500px;height:500px;background:radial-gradient(circle,rgba(99,102,241,0.1),transparent 70%);border-radius:50%}
+.news-feature .num{font-size:120px;font-weight:900;color:rgba(255,255,255,0.05);position:absolute;top:20px;right:40px}
+.news-feature .headline{font-size:44px;font-weight:900;line-height:1.3;margin-bottom:20px;position:relative;z-index:1}
+.news-feature .summary{font-size:26px;color:#c4b5fd;line-height:1.6;position:relative;z-index:1}
+.news-small{display:flex;gap:24px}
+.news-small-card{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:35px}
+.news-small-card .num{font-size:36px;font-weight:900;color:#818cf8;margin-bottom:12px}
+.news-small-card .headline{font-size:28px;font-weight:800;line-height:1.3;margin-bottom:10px}
+.news-small-card .summary{font-size:20px;color:#94a3b8;line-height:1.5}
+.logo{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);font-size:36px;font-weight:900;letter-spacing:3px;z-index:3}
+.logo { font-family: 'Archivo Black', sans-serif; font-style: italic; }
+.logo span.highlight { color: #c084fc; }
+</style>
+</head>
+<body>
+<div class="page-indicator">{{slideNum}}/{{totalSlides}}</div>
+<div class="content">
+    <div class="news-feature">
+        <div class="num">1</div>
+        <div class="headline">{{n1Headline}}</div>
+        <div class="summary">{{n1Summary}}</div>
+    </div>
+    <div class="news-small">
+        <div class="news-small-card">
+            <div class="num">#2</div>
+            <div class="headline">{{n2Headline}}</div>
+            <div class="summary">{{n2Summary}}</div>
+        </div>
+        <div class="news-small-card">
+            <div class="num">#3</div>
+            <div class="headline">{{n3Headline}}</div>
+            <div class="summary">{{n3Summary}}</div>
+        </div>
+    </div>
+</div>
+<div class="logo">@kbo_data_<span class="highlight">lab</span></div>
+</body>
+</html>

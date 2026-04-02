@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBO 자동 캐러셀 메이커</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="logo">⚾ KBO Carousel AI</div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="targetDate">대상 날짜</label>
+                    <input type="date" id="targetDate" value="2026-03-28">
+                </div>
+                
+                <button id="btnGenerate" class="btn-primary">데이터 수집 및 생성 🚀</button>
+            </div>
+
+            <div id="statusBox" class="status-box hidden">
+                <div class="loader"></div>
+                <span id="statusText">데이터 크롤링 중...</span>
+            </div>
+
+            <div class="download-section hidden" id="downloadSection">
+                <button id="btnDownloadZip" class="btn-success">📸 10장 모두 다운로드 (.zip)</button>
+            </div>
+        </aside>
+
+        <main class="preview-area">
+            <button class="nav-btn prev-btn hidden" id="btnPrev">❮</button>
+            <div class="slider-container" id="sliderContainer">
+                <div class="empty-state">
+                    <h3>생성하기 버튼을 눌러주세요</h3>
+                    <p>네이버 스포츠 API + Gemini가 10장의 완벽한 인스타 피드를 만들어냅니다.</p>
+                </div>
+                <!-- 렌더링된 이미지들이 여기에 스크롤로 가로배치됨 -->
+            </div>
+            <button class="nav-btn next-btn hidden" id="btnNext">❯</button>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

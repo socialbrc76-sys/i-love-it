@@ -51,7 +51,7 @@ async function renderCarousel(finalData, outputDir) {
     const top5 = (finalData.mvpData && finalData.mvpData.top5) || [];
     const mvp = (finalData.mvpData && finalData.mvpData.topMVP) || null;
     const br = finalData.battingRace || [];
-    const rookies = finalData.rookies || [];
+    const pr = finalData.pitcherRace || [];
     const news = finalData.hotNews || [];
     const ai = finalData.aiPrediction || null;
 
@@ -250,24 +250,53 @@ async function renderCarousel(finalData, outputDir) {
             }, `${dateStr}_05_mvp_detail.png`);
         }
 
-        // ── 6. 루키 스포트라이트 ──
-        if (rookies.length >= 3) {
-            await captureSlide('rookie.html', {
+        // ── 6. ERA 레이스 (F1 스타일 팀 컬러 + 순위 변동) ──
+        if (pr.length >= 4) {
+            // 전날 데이터 로드 (순위 변동 비교용)
+            const prevDate = new Date(finalData.date);
+            prevDate.setDate(prevDate.getDate() - 1);
+            const prevStr = prevDate.toISOString().split('T')[0].replace(/-/g, '');
+            const prevPath = path.join(outputDir, `data_${prevStr}.json`);
+            let prevPitcherRanks = {};
+            if (fs.existsSync(prevPath)) {
+                try {
+                    const prev = JSON.parse(fs.readFileSync(prevPath, 'utf-8'));
+                    (prev.pitcherRace || []).forEach((p, i) => { prevPitcherRanks[p.playerName] = i + 1; });
+                } catch(e) { /* ignore */ }
+            }
+
+            function getPitcherRankChange(name, currentRank) {
+                if (!prevPitcherRanks[name]) return { text: 'NEW', cls: 'new' };
+                const diff = prevPitcherRanks[name] - currentRank;
+                if (diff > 0) return { text: `▲${diff}`, cls: 'up' };
+                if (diff < 0) return { text: `▼${Math.abs(diff)}`, cls: 'down' };
+                return { text: '—', cls: 'same' };
+            }
+
+            const pc1 = getPitcherRankChange(pr[0].playerName, 1), pc2 = getPitcherRankChange(pr[1].playerName, 2);
+            const pc3 = getPitcherRankChange(pr[2].playerName, 3), pc4 = getPitcherRankChange(pr[3].playerName, 4);
+            const ptc1 = getTeamColor(pr[0].teamName), ptc2 = getTeamColor(pr[1].teamName);
+            const ptc3 = getTeamColor(pr[2].teamName), ptc4 = getTeamColor(pr[3].teamName);
+            await captureSlide('era-race.html', {
                 slideNum: 6,
-                r1Name: rookies[0].playerName, r1Team: rookies[0].teamName, r1Avg: rookies[0].avg, r1Ops: rookies[0].ops, r1Note: rookies[0].isFirstHit ? '🎉 프로 첫 안타 달성!' : '프로 적응 중',
-                r2Name: rookies[1].playerName, r2Team: rookies[1].teamName, r2Avg: rookies[1].avg, r2Ops: rookies[1].ops, r2Note: rookies[1].isFirstHit ? '🎉 프로 첫 안타 달성!' : '프로 적응 중',
-                r3Name: rookies[2].playerName, r3Team: rookies[2].teamName, r3Avg: rookies[2].avg, r3Ops: rookies[2].ops, r3Note: rookies[2].isFirstHit ? '🎉 프로 첫 안타 달성!' : '프로 적응 중',
-            }, `${dateStr}_06_rookie.png`);
+                t1Name: pr[0].playerName, t1Team: pr[0].teamName, t1Era: pr[0].era, t1Inning: pr[0].inning, t1Kk: pr[0].kk, t1Color: ptc1.color, t1Change: pc1.text, t1ChangeClass: pc1.cls, t1Img: pr[0].imageUrl,
+                t2Name: pr[1].playerName, t2Team: pr[1].teamName, t2Era: pr[1].era, t2Inning: pr[1].inning, t2Kk: pr[1].kk, t2Color: ptc2.color, t2Change: pc2.text, t2ChangeClass: pc2.cls, t2Img: pr[1].imageUrl,
+                t3Name: pr[2].playerName, t3Team: pr[2].teamName, t3Era: pr[2].era, t3Inning: pr[2].inning, t3Kk: pr[2].kk, t3Color: ptc3.color, t3Change: pc3.text, t3ChangeClass: pc3.cls, t3Img: pr[2].imageUrl,
+                t4Name: pr[3].playerName, t4Team: pr[3].teamName, t4Era: pr[3].era, t4Inning: pr[3].inning, t4Kk: pr[3].kk, t4Color: ptc4.color, t4Change: pc4.text, t4ChangeClass: pc4.cls, t4Img: pr[3].imageUrl,
+            }, `${dateStr}_06_era.png`);
         }
 
-        // ── 7. 루키 상세 (재활용: 루키 1위 선수 MVP 스코어 비교) ──
-        if (rookies.length >= 3) {
-            await captureSlide('rookie.html', {
+        // ── 7. ERA 상세 2×2 카드 (팀 컬러 + 선수 사진 + 승/패/WHIP) ──
+        if (pr.length >= 4) {
+            const ptc1 = getTeamColor(pr[0].teamName), ptc2 = getTeamColor(pr[1].teamName);
+            const ptc3 = getTeamColor(pr[2].teamName), ptc4 = getTeamColor(pr[3].teamName);
+            await captureSlide('era-detail.html', {
                 slideNum: 7,
-                r1Name: rookies[0].playerName, r1Team: rookies[0].teamName, r1Avg: rookies[0].avg, r1Ops: rookies[0].ops, r1Note: `타율 ${rookies[0].avg} · 프로 데뷔전`,
-                r2Name: rookies[1].playerName, r2Team: rookies[1].teamName, r2Avg: rookies[1].avg, r2Ops: rookies[1].ops, r2Note: `타율 ${rookies[1].avg} · 기대주`,
-                r3Name: rookies[2].playerName, r3Team: rookies[2].teamName, r3Avg: rookies[2].avg, r3Ops: rookies[2].ops, r3Note: `타율 ${rookies[2].avg} · 적응 중`,
-            }, `${dateStr}_07_rookie_detail.png`);
+                t1Name: pr[0].playerName, t1Team: pr[0].teamName, t1Era: pr[0].era, t1Inning: pr[0].inning, t1Kk: pr[0].kk, t1Win: pr[0].win, t1Lose: pr[0].lose, t1Whip: pr[0].whip, t1Color: ptc1.color, t1Img: pr[0].imageUrl,
+                t2Name: pr[1].playerName, t2Team: pr[1].teamName, t2Era: pr[1].era, t2Inning: pr[1].inning, t2Kk: pr[1].kk, t2Win: pr[1].win, t2Lose: pr[1].lose, t2Whip: pr[1].whip, t2Color: ptc2.color, t2Img: pr[1].imageUrl,
+                t3Name: pr[2].playerName, t3Team: pr[2].teamName, t3Era: pr[2].era, t3Inning: pr[2].inning, t3Kk: pr[2].kk, t3Win: pr[2].win, t3Lose: pr[2].lose, t3Whip: pr[2].whip, t3Color: ptc3.color, t3Img: pr[2].imageUrl,
+                t4Name: pr[3].playerName, t4Team: pr[3].teamName, t4Era: pr[3].era, t4Inning: pr[3].inning, t4Kk: pr[3].kk, t4Win: pr[3].win, t4Lose: pr[3].lose, t4Whip: pr[3].whip, t4Color: ptc4.color, t4Img: pr[3].imageUrl,
+            }, `${dateStr}_07_era_detail.png`);
         }
 
         // ── 8. 핫뉴스 Top3 ──

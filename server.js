@@ -9,7 +9,7 @@ const fs = require('fs');
 const naverSportsAPI = require('./src/api/naverSports');
 const geminiAPI = require('./src/api/gemini');
 const { getDailyMVP } = require('./src/analysis/mvpScore');
-const { getTopBatters, getRookiesFromGemini } = require('./src/analysis/rankings');
+const { getTopBatters, getTopPitchers } = require('./src/analysis/rankings');
 const { renderCarousel } = require('./src/render/puppeteer');
 
 const app = express();
@@ -55,9 +55,12 @@ app.get('/api/generate', async (req, res) => {
         console.log(`[2] Analyzing Data (MVP, Rankings)...`);
         const mvpData = getDailyMVP(gamesRecordData);
         
-        const seasonHitters = await naverSportsAPI.getHitterRanking('2026');
+        const seasonYear = dateDash.substring(0, 4);
+        const seasonHitters = await naverSportsAPI.getHitterRanking(seasonYear);
         const topBatters = getTopBatters(seasonHitters);
-        const rookies = await getRookiesFromGemini(seasonHitters);
+
+        const seasonPitchers = await naverSportsAPI.getPitcherRanking(seasonYear || '2026');
+        const topPitchers = getTopPitchers(seasonPitchers);
 
         console.log(`[3] Fetching News & Gemini Analysis...`);
         const recentNews = await naverSportsAPI.getNews(dateStr);
@@ -74,7 +77,7 @@ app.get('/api/generate', async (req, res) => {
             date: dateDash,
             mvpData,
             battingRace: topBatters,
-            rookies,
+            pitcherRace: topPitchers,
             hotNews: hotNewsList,
             aiPrediction
         };

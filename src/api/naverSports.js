@@ -71,6 +71,24 @@ const naverSportsAPI = {
          console.error(`Error fetching news for ${dateStrCompact}:`, error.message);
          return [];
      }
+  },
+
+  // 5. 시즌 누적 평균자책점 순위 가져오기 (투수 ERA)
+  async getPitcherRanking(season = '2026') {
+    try {
+      const url = `https://api-gw.sports.naver.com/statistics/categories/kbo/seasons/${season}/players?sortField=pitcherEra&sortDirection=asc&playerType=PITCHER&gameType=REGULAR_SEASON`;
+      const response = await axios.get(url, {
+        headers: {
+          'Origin': 'https://sports.news.naver.com',
+          'Referer': 'https://sports.news.naver.com/',
+          'User-Agent': 'Mozilla/5.0'
+        }
+      });
+      return response.data.result.seasonPlayerStats || [];
+    } catch (error) {
+       console.error(`Error fetching pitcher ranking:`, error.message);
+       return [];
+    }
   }
 };
 

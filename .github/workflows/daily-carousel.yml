@@ -2,9 +2,8 @@ name: Daily KBO Carousel Generator
 
 on:
   schedule:
-    # 매일 UTC 23:30 (한국 시간 오전 8시 30분)실행
-    # KBO 경기는 보통 화~일에 있으나, 혹시 모를 상황을 대비해 매일 돌게 둡니다. (스크립트에서 경기 없으면 자동 종료)
-    - cron: '30 23 * * *'
+    # 매일 UTC 22:00 (한국 시간 오전 7시 00분)실행
+    - cron: '0 22 * * *'
   workflow_dispatch:
     # 수동 실행 버튼 활성화 (테스트용)
 

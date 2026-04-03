@@ -133,15 +133,18 @@ async function runPipeline() {
         // Discord로 전송
         await notifyDiscord(generatedImages, dateDash);
 
-        // Instagram 자동 업로드
+        // Instagram 동적 캡션 + 해시태그 댓글 생성
+        console.log(`[5-1] Gemini 기반 인스타그램 캡션/해시태그 생성 (보조)...`);
+        const idx = generatedImages[0].indexOf('/output/');
+        const igData = await geminiAPI.generateInstagramCaption(finalData);
+
         const imagePaths = generatedImages.map(imgRelPath => {
             const filename = imgRelPath.split('?')[0].replace('/output/', '');
             return path.join(outputDir, filename);
         });
         
-        const caption = `🏆 ${dateDash} KBO 데일리 리포트\n\n오늘의 KBO 경기 요약과 선수 랭킹, 그리고 AI의 내일 경기 예측까지!\n매일 아침 업데이트되는 생생한 야구 소식을 확인하세요. ⚾🔥\n\n#KBO #프로야구 #야구 #KBO리그 #오늘의MVP #타율왕 #ERA #야구팬`;
         try {
-            await publishToInstagram(imagePaths, caption);
+            await publishToInstagram(imagePaths, igData.caption, igData.comment);
         } catch (igError) {
             console.error('⚠️ 인스타그램 업로드 파이프라인 중 오류가 발생했습니다. (Discord 전송은 완료됨)', igError.message);
         }

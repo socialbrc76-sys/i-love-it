@@ -86,9 +86,28 @@ async function publishMedia(creationId, token) {
 }
 
 /**
- * [메인 발행 파이프라인] 이미지를 차례대로 업로드하고 Instagram에 최종 포스팅합니다. 
+ * 5. 생성된 미디어(게시물)에 첫 번째 댓글(해시태그) 달기
  */
-async function publishToInstagram(imagePaths, caption) {
+async function postComment(mediaId, commentText, token) {
+    try {
+        const response = await axios.post(`https://graph.instagram.com/v19.0/${mediaId}/comments`, null, {
+            params: {
+                message: commentText,
+                access_token: token
+            }
+        });
+        return response.data.id;
+    } catch (error) {
+        console.error('❌ 인스타그램 댓글 달기 실패:', error.response?.data || error.message);
+        // 댓글 달기 실패는 치명적 파이프라인 에러로 간주하지 않음
+        return null;
+    }
+}
+
+/**
+ * [메인 발행 파이프라인] 이미지를 차례대로 업로드하고 Instagram에 최종 포스팅 및 댓글 작성합니다. 
+ */
+async function publishToInstagram(imagePaths, caption, commentText) {
     const token = process.env.IG_ACCESS_TOKEN;
     if (!token) {
         console.log('⚠️ IG_ACCESS_TOKEN이 설정되지 않아 인스타그램 자동 업로드를 건너뜁니다.');
@@ -124,8 +143,17 @@ async function publishToInstagram(imagePaths, caption) {
     // 4단계: 최종 발행
     console.log(`[Instagram-4] 캐러셀 피드를 최종 발행합니다!`);
     const publishedMediaId = await publishMedia(carouselContainerId, token);
-    
-    console.log(`✅ [Instagram SUCCESS] 성공적으로 업로드되었습니다! (Media ID: ${publishedMediaId})`);
+    console.log(`  └ 본문 게시 완료 (Media ID: ${publishedMediaId})`);
+
+    // 5단계: 해시태그 댓글 작성
+    if (commentText) {
+        console.log(`[Instagram-5] 첫 번째 댓글(해시태그) 작성 중...`);
+        await delay(3000); // 게시물이 서버에 완전히 반영될 때까지 약간 대기
+        await postComment(publishedMediaId, commentText, token);
+        console.log(`  └ 댓글 달기 완료!`);
+    }
+
+    console.log(`✅ [Instagram SUCCESS] 성공적으로 전체 업로드되었습니다!`);
     return `https://www.instagram.com/p/${publishedMediaId}`; 
 }
 

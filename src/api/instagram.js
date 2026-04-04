@@ -3,8 +3,32 @@ const fs = require('fs');
 const FormData = require('form-data');
 const path = require('path');
 
-// 대기 시간 유틸리티 (Rate Limit 방지용)
-const delay = ms => new Promise(res => setTimeout(res, ms));
+/**
+ * 자동 재시도 래퍼 함수 (Transient 에러 대비)
+ */
+async function withRetry(fn, maxRetries = 3, targetName = "작업") {
+    let attempt = 0;
+    while (attempt < maxRetries) {
+        try {
+            return await fn();
+        } catch (error) {
+            attempt++;
+            const isTransient = error.response?.data?.error?.is_transient;
+            const code = error.response?.data?.error?.code;
+            
+            console.error(`⚠️ [${targetName}] ${attempt}차 시도 실패:`, error.response?.data?.error?.message || error.message);
+            
+            // 일시적(Transient) 에러이거나 Code 2, 또는 500번대 에러일 때만 재시도
+            if (attempt < maxRetries && (isTransient || code === 2 || !error.response || error.response.status >= 500)) {
+                const waitTime = attempt * 3000; // 3초, 6초
+                console.log(`⏳ ${waitTime / 1000}초 후 재시도합니다...`);
+                await delay(waitTime);
+            } else {
+                throw error;
+            }
+        }
+    }
+}
 
 /**
  * 1. 로컬 이미지를 Freeimage.host에 업로드하여 임시 퍼블릭 URL을 받아옵니다.
@@ -17,22 +41,21 @@ async function uploadToFreeImageHost(imagePath) {
     form.append('format', 'json');
     form.append('source', fs.createReadStream(imagePath));
 
-    try {
+    return await withRetry(async () => {
         const response = await axios.post('https://freeimage.host/api/1/upload', form, {
-            headers: form.getHeaders()
+            headers: form.getHeaders(),
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity
         });
         return response.data.image.url;
-    } catch (error) {
-        console.error(`❌ 외부 이미지 호스팅 업로드 실패 (${path.basename(imagePath)}):`, error.response?.data || error.message);
-        throw error;
-    }
+    }, 3, `이미지 업로드(${path.basename(imagePath)})`);
 }
 
 /**
  * 2. Instagram Graph API (Creator) - 캐러셀 개별 아이템(자식 컨테이너) 생성
  */
 async function createCarouselItem(imageUrl, token) {
-    try {
+    return await withRetry(async () => {
         const response = await axios.post('https://graph.instagram.com/me/media', null, {
             params: {
                 image_url: imageUrl,
@@ -41,17 +64,14 @@ async function createCarouselItem(imageUrl, token) {
             }
         });
         return response.data.id;
-    } catch (error) {
-        console.error('❌ 캐러셀 아이템 생성 실패:', error.response?.data || error.message);
-        throw error;
-    }
+    }, 3, `캐러셀 아이템 생성`);
 }
 
 /**
  * 3. 개별 아이템들을 묶어 하나의 캐러셀 컨테이너 생성 (캡션 포함)
  */
 async function createCarouselContainer(childrenIds, caption, token) {
-    try {
+    return await withRetry(async () => {
         const response = await axios.post('https://graph.instagram.com/me/media', null, {
             params: {
                 media_type: 'CAROUSEL',
@@ -61,17 +81,14 @@ async function createCarouselContainer(childrenIds, caption, token) {
             }
         });
         return response.data.id;
-    } catch (error) {
-        console.error('❌ 캐러셀 묶음 컨테이너 생성 실패:', error.response?.data || error.message);
-        throw error;
-    }
+    }, 3, `캐러셀 묶음 컨테이너 생성`);
 }
 
 /**
  * 4. 생성된 캐러셀 컨테이너를 피드에 최종 발행
  */
 async function publishMedia(creationId, token) {
-    try {
+    return await withRetry(async () => {
         const response = await axios.post('https://graph.instagram.com/me/media_publish', null, {
             params: {
                 creation_id: creationId,
@@ -79,17 +96,14 @@ async function publishMedia(creationId, token) {
             }
         });
         return response.data.id;
-    } catch (error) {
-        console.error('❌ 인스타그램 최종 발행 실패:', error.response?.data || error.message);
-        throw error;
-    }
+    }, 3, `최종 미디어 발행`);
 }
 
 /**
  * 5. 생성된 미디어(게시물)에 첫 번째 댓글(해시태그) 달기
  */
 async function postComment(mediaId, commentText, token) {
-    try {
+    return await withRetry(async () => {
         const response = await axios.post(`https://graph.instagram.com/v19.0/${mediaId}/comments`, null, {
             params: {
                 message: commentText,
@@ -97,11 +111,7 @@ async function postComment(mediaId, commentText, token) {
             }
         });
         return response.data.id;
-    } catch (error) {
-        console.error('❌ 인스타그램 댓글 달기 실패:', error.response?.data || error.message);
-        // 댓글 달기 실패는 치명적 파이프라인 에러로 간주하지 않음
-        return null;
-    }
+    }, 3, `댓글 달기`);
 }
 
 /**
@@ -130,9 +140,10 @@ async function publishToInstagram(imagePaths, caption, commentText) {
     const childrenIds = [];
     console.log(`[Instagram-2] 개별 이미지 카드를 인스타그램 서버에 아이템으로 등록 중...`);
     for (let i = 0; i < imageUrls.length; i++) {
+        // 이미지가 호스팅 CDN에 캐싱될 수 있도록 약간의 여유를 줌 (중요)
+        await delay(2000); 
         const itemId = await createCarouselItem(imageUrls[i], token);
         childrenIds.push(itemId);
-        await delay(1000); 
     }
 
     // 3단계: 아이템들을 하나로 묶기

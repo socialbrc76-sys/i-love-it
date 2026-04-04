@@ -3,6 +3,9 @@ const fs = require('fs');
 const FormData = require('form-data');
 const path = require('path');
 
+// 대기 시간 유틸리티 (Rate Limit 방지용)
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 /**
  * 자동 재시도 래퍼 함수 (Transient 에러 대비)
  */

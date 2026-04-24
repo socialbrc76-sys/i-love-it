@@ -1,4 +1,4 @@
-const { GoogleGenAI } = require('@google/genai');
+﻿const { GoogleGenAI } = require('@google/genai');
 
 // NOTE: Initialize with api_key from environment variable
 // Ensure process.env.GEMINI_API_KEY is set
@@ -136,8 +136,10 @@ ${h2hText}
 
 [작성 가이드]
 1. 본문(caption)은 유쾌하고 친근한 톤(이모지 적극 활용)으로 구성하고, 오늘 경기의 핵심 이슈 1~2개와 내일 예측 타자를 언급하며 오른쪽으로 넘겨(스와이프) 보라는 안내를 포함하세요.
-2. 본문 마지막에는 "👇 숫자가 알려주는 진짜 KBO 이야기 \n@kbo_data_lab 팔로우하고 매일 야구 200% 즐기기 📬" 와 같은 채널 홍보를 넣어주세요.
-3. 댓글(comment)은 본문과 분리하여 해시태그만 15~20개 정도 꽉꽉 채워넣어 주세요 (ex. #KBO #KBO리그 #프로야구 등 팀명, 선수이름 포함).
+2. 본문 마지막에는 아래 두 블록을 순서대로 넣어주세요:
+   - "👇 숫자가 알려주는 진짜 KBO 이야기 \n@kbo_data_lab 팔로우하고 매일 야구 200% 즐기기 📬"
+   - "🎸 운영자의 음악 채널도 놀러오세요!\n🌌 AI 밴드 Cosmic Void의 감성 커버\n▶ YouTube에서 'Cosmic Void' 검색! 🔎"
+3. 댓글(comment)은 본문과 분리하여 해시태그만 15~20개 정도 꽉꽉 채워넣어 주세요 (ex. #KBO #KBO리그 #프로야구 등 팀명, 선수이름 포함). 마지막에 #CosmicVoid #AI밴드 #Kpop커버 해시태그도 반드시 포함하세요.
 
 [출력 형식 제한 (반드시 JSON 객체로만 반환, 마크다운 코드블록 생략)]
 {

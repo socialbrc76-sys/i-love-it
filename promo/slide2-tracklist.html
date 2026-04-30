@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>KIA 응원가 - 하이라이트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    background: #0a0a1a;
+}
+
+.bg-gradient {
+    position: absolute; top:0; left:0; width:100%; height:100%;
+    background: 
+        radial-gradient(ellipse at 50% 30%, rgba(180,120,30,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(200,16,46,0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #0d0816 0%, #140c28 50%, #0a0a1a 100%);
+    z-index: 1;
+}
+
+/* 헤더 */
+.header {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 55px 60px 25px;
+}
+.header-badge {
+    display: inline-block;
+    background: rgba(255,200,80,0.15);
+    border: 1px solid rgba(255,200,80,0.3);
+    color: #ffd700;
+    font-weight: 800;
+    font-size: 22px;
+    padding: 8px 24px;
+    border-radius: 30px;
+    margin-bottom: 14px;
+}
+.header h1 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 56px;
+    line-height: 1.2;
+}
+.header h1 .gold {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 트랙 리스트 */
+.tracklist {
+    position: relative; z-index: 10;
+    padding: 10px 70px;
+}
+.track {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 28px;
+    margin-bottom: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    transition: all 0.3s;
+}
+.track:nth-child(odd) {
+    border-left: 4px solid #c8102e;
+}
+.track:nth-child(even) {
+    border-left: 4px solid #ffd700;
+}
+.track-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 38px;
+    color: rgba(255,255,255,0.2);
+    min-width: 50px;
+}
+.track-info {
+    flex: 1;
+}
+.track-name {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+}
+.track-player {
+    font-size: 20px;
+    color: rgba(255,255,255,0.45);
+}
+.track-icon {
+    font-size: 36px;
+}
+.track-wave {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 30px;
+}
+.track-wave span {
+    width: 4px;
+    background: #c8102e;
+    border-radius: 2px;
+    animation: wave 1.2s ease-in-out infinite;
+}
+.track-wave span:nth-child(1) { height: 12px; animation-delay: 0s; }
+.track-wave span:nth-child(2) { height: 22px; animation-delay: 0.15s; }
+.track-wave span:nth-child(3) { height: 16px; animation-delay: 0.3s; }
+.track-wave span:nth-child(4) { height: 28px; animation-delay: 0.45s; }
+.track-wave span:nth-child(5) { height: 18px; animation-delay: 0.6s; }
+
+@keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.5); }
+}
+
+/* 이모지 강조 박스 */
+.highlight-box {
+    position: relative; z-index: 10;
+    margin: 12px 70px;
+    background: linear-gradient(135deg, rgba(200,16,46,0.15), rgba(255,170,0,0.1));
+    border: 1px solid rgba(255,200,100,0.2);
+    border-radius: 20px;
+    padding: 20px 36px;
+    text-align: center;
+}
+.highlight-box .emoji-row {
+    font-size: 36px;
+    margin-bottom: 6px;
+}
+.highlight-box .hl-text {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fbbf24;
+    line-height: 1.5;
+    word-break: keep-all;
+}
+.highlight-box .hl-sub {
+    font-size: 20px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 8px;
+}
+
+/* 하단 CTA */
+.bottom-cta {
+    position: absolute;
+    bottom: 48px; left: 0; width: 100%;
+    z-index: 10;
+    text-align: center;
+    padding: 0 70px;
+}
+.yt-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: linear-gradient(135deg, rgba(255,0,50,0.15), rgba(168,85,247,0.12));
+    border: 1px solid rgba(255,100,150,0.2);
+    border-radius: 20px;
+    padding: 22px 36px;
+}
+.yt-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff0050, #c850c0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+}
+.yt-text .yt-ch { font-size: 24px; font-weight: 800; color: #fbbf24; }
+.yt-text .yt-handle { font-size: 18px; color: #a78bfa; font-weight: 600; margin-top: 2px; }
+
+.footer {
+    position: absolute;
+    bottom: 18px; width: 100%;
+    text-align: center; z-index: 10;
+}
+.footer-text {
+    font-family: 'Archivo Black', sans-serif;
+    font-style: italic;
+    font-size: 24px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+}
+.footer-text .neon { color: #c084fc; }
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+
+<div class="header">
+    <div class="header-badge">🎼 TRACKLIST</div>
+    <h1>🐯 이 곡들이 <span class="gold">오케스트라</span>로<br>다시 태어났습니다</h1>
+</div>
+
+<div class="tracklist">
+    <div class="track">
+        <div class="track-num">01</div>
+        <div class="track-info">
+            <div class="track-name">KIA 타이거즈 구단가</div>
+            <div class="track-player">그 이름 영원한 KIA 🏆</div>
+        </div>
+        <div class="track-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="track">
+        <div class="track-num">02</div>
+        <div class="track-info">
+            <div class="track-name">이창진 응원가</div>
+            <div class="track-player">🔥 전율의 시작</div>
+        </div>
+        <div class="track-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="track">
+        <div class="track-num">03</div>
+        <div class="track-info">
+            <div class="track-name">김도영 응원가</div>
+            <div class="track-player">⚡ 광주의 유망주</div>
+        </div>
+        <div class="track-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="track">
+        <div class="track-num">04</div>
+        <div class="track-info">
+            <div class="track-name">나성범 응원가</div>
+            <div class="track-player">💪 파워 슬러거</div>
+        </div>
+        <div class="track-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="track">
+        <div class="track-num">05</div>
+        <div class="track-info">
+            <div class="track-name">최형우 응원가</div>
+            <div class="track-player">👑 레전드 프랜차이즈 스타</div>
+        </div>
+        <div class="track-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="track">
+        <div class="track-num">06</div>
+        <div class="track-info">
+            <div class="track-name">승리의 노래</div>
+            <div class="track-player">🎆 피날레 Grand Finale</div>
+        </div>
+        <div class="track-wave"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+</div>
+
+<div class="bottom-cta">
+    <div class="yt-banner">
+        <div class="yt-icon">▶</div>
+        <div class="yt-text">
+            <div class="yt-ch">🎻 야구장의 함성을 웅장한 교향곡으로!</div>
+            <div class="yt-handle">YouTube 🔎 Cosmic Void 검색!</div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <span class="footer-text">@kbo_data_<span class="neon">lab</span></span>
+</div>
+</body>
+</html>

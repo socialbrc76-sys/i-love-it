@@ -1,0 +1,21 @@
+name: Keepalive - Prevent GitHub from disabling cron
+
+on:
+  schedule:
+    # 매월 1일, 15일 UTC 12:00 (KST 21:00) — 한 달에 두 번 자동 커밋
+    - cron: '0 12 1,15 * *'
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create keepalive commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "chore: keepalive commit to prevent workflow disabling [skip ci]"
+          git push

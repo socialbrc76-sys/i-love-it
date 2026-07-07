@@ -1,37 +1,72 @@
 [
   {
-    "playerName": "디아즈",
-    "teamName": "삼성",
-    "mvpScore": 10.5,
-    "date": "2026-07-07",
-    "playerCode": "54400"
-  },
-  {
-    "playerName": "최정",
+    "playerName": "김재환",
     "teamName": "SSG",
-    "mvpScore": 9.5,
-    "date": "2026-07-07",
-    "playerCode": "75847"
+    "mvpScore": 27.5,
+    "date": "2026-06-20",
+    "playerCode": "78224"
   },
   {
-    "playerName": "박건우",
+    "playerName": "김호령",
+    "teamName": "KIA",
+    "mvpScore": 24,
+    "date": "2026-05-19",
+    "playerCode": "65653"
+  },
+  {
+    "playerName": "강백호",
+    "teamName": "한화",
+    "mvpScore": 23.5,
+    "date": "2026-05-16",
+    "playerCode": "68050"
+  },
+  {
+    "playerName": "최재훈",
+    "teamName": "한화",
+    "mvpScore": 21,
+    "date": "2026-03-23",
+    "playerCode": "78288"
+  },
+  {
+    "playerName": "최주환",
+    "teamName": "키움",
+    "mvpScore": 20.5,
+    "date": "2026-05-09",
+    "playerCode": "76267"
+  },
+  {
+    "playerName": "오스틴",
+    "teamName": "LG",
+    "mvpScore": 20.5,
+    "date": "2026-06-10",
+    "playerCode": "53123"
+  },
+  {
+    "playerName": "김휘집",
     "teamName": "NC",
-    "mvpScore": 9,
-    "date": "2026-07-07",
-    "playerCode": "79215"
+    "mvpScore": 20.5,
+    "date": "2026-07-03",
+    "playerCode": "51344"
   },
   {
-    "playerName": "고준휘",
-    "teamName": "NC",
-    "mvpScore": 9,
-    "date": "2026-07-07",
-    "playerCode": "56949"
+    "playerName": "페라자",
+    "teamName": "한화",
+    "mvpScore": 20,
+    "date": "2026-06-20",
+    "playerCode": "54730"
   },
   {
-    "playerName": "레이예스",
-    "teamName": "롯데",
-    "mvpScore": 9,
-    "date": "2026-07-07",
-    "playerCode": "54529"
+    "playerName": "장성우",
+    "teamName": "KT",
+    "mvpScore": 19.5,
+    "date": "2026-04-02",
+    "playerCode": "78548"
+  },
+  {
+    "playerName": "이재현",
+    "teamName": "삼성",
+    "mvpScore": 19.5,
+    "date": "2026-05-14",
+    "playerCode": "52415"
   }
 ]

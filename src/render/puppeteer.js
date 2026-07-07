@@ -15,10 +15,10 @@ function injectData(html, data) {
 async function renderCarousel(finalData, outputDir) {
     const browser = await puppeteer.launch({
         headless: "new",
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--force-device-scale-factor=2']
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: 1 });
 
     const generatedFiles = [];
     const dateStr = finalData.date.replace(/-/g, '');
@@ -38,7 +38,7 @@ async function renderCarousel(finalData, outputDir) {
             await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 5000 });
             await new Promise(r => setTimeout(r, 1200));
             const outPath = path.join(outputDir, filename);
-            await page.screenshot({ path: outPath, type: 'png' });
+            await page.screenshot({ path: outPath, type: 'jpeg', quality: 90 });
             generatedFiles.push(`/output/${filename}?v=${Date.now()}`);
             console.log(`  ✅ [${generatedFiles.length}/${totalSlides}] ${filename}`);
             return true;
@@ -159,7 +159,7 @@ async function renderCarousel(finalData, outputDir) {
             p3Accent: c3.accent, p3Text: getContrastText(c3.accent),
             p4Name: p4.playerName || '-', p4Team: p4.teamName || '-', p4Img: getPlayerImgUrl(p4), p4Stats: buildStatsLine(p4), p4BgUrl: bgDataUris[3] || '',
             p4Accent: c4.accent, p4Text: getContrastText(c4.accent),
-        }, `${dateStr}_01_cover.png`);
+        }, `${dateStr}_01_cover.jpg`);
 
         // ═══════════════════════════════════════════════
         // 슬라이드 2: 오늘의 MVP + 상세 (합본) ⭐ NEW
@@ -187,7 +187,7 @@ async function renderCarousel(finalData, outputDir) {
                 mvpColor: mvpTc.color, mvpColorAlpha: hexToRgba(mvpTc.color, 0.15),
                 mvpImg: getPlayerImgUrl(mvp),
                 inningItems,
-            }, `${dateStr}_02_mvp_combined.png`);
+            }, `${dateStr}_02_mvp_combined.jpg`);
         }
 
         // ═══════════════════════════════════════════════
@@ -217,7 +217,7 @@ async function renderCarousel(finalData, outputDir) {
                 raceData[`${prefix}New`] = '';
             }
         }
-        await captureSlide('season-mvp-race.html', { slideNum: 3, ...raceData }, `${dateStr}_03_season_mvp.png`);
+        await captureSlide('season-mvp-race.html', { slideNum: 3, ...raceData }, `${dateStr}_03_season_mvp.jpg`);
 
         // ═══════════════════════════════════════════════
         // 슬라이드 4: 타율왕 레이스 (F1 스타일) — 기존 유지 + 스탯 보강
@@ -253,7 +253,7 @@ async function renderCarousel(finalData, outputDir) {
                 t2Name: br[1].playerName, t2Team: br[1].teamName, t2Avg: br[1].avg, t2Ab: br[1].ab, t2Hit: br[1].hit, t2Color: tc2.color, t2TeamShort: tc2.short, t2Change: rc2.text, t2ChangeClass: rc2.cls, t2Img: br[1].imageUrl,
                 t3Name: br[2].playerName, t3Team: br[2].teamName, t3Avg: br[2].avg, t3Ab: br[2].ab, t3Hit: br[2].hit, t3Color: tc3.color, t3TeamShort: tc3.short, t3Change: rc3.text, t3ChangeClass: rc3.cls, t3Img: br[2].imageUrl,
                 t4Name: br[3].playerName, t4Team: br[3].teamName, t4Avg: br[3].avg, t4Ab: br[3].ab, t4Hit: br[3].hit, t4Color: tc4.color, t4TeamShort: tc4.short, t4Change: rc4.text, t4ChangeClass: rc4.cls, t4Img: br[3].imageUrl,
-            }, `${dateStr}_04_batting.png`);
+            }, `${dateStr}_04_batting.jpg`);
         }
 
         // ═══════════════════════════════════════════════
@@ -290,7 +290,7 @@ async function renderCarousel(finalData, outputDir) {
                 t2Name: pr[1].playerName, t2Team: pr[1].teamName, t2Era: pr[1].era, t2Inning: pr[1].inning, t2Kk: pr[1].kk, t2Color: ptc2.color, t2Change: pc2.text, t2ChangeClass: pc2.cls, t2Img: pr[1].imageUrl,
                 t3Name: pr[2].playerName, t3Team: pr[2].teamName, t3Era: pr[2].era, t3Inning: pr[2].inning, t3Kk: pr[2].kk, t3Color: ptc3.color, t3Change: pc3.text, t3ChangeClass: pc3.cls, t3Img: pr[2].imageUrl,
                 t4Name: pr[3].playerName, t4Team: pr[3].teamName, t4Era: pr[3].era, t4Inning: pr[3].inning, t4Kk: pr[3].kk, t4Color: ptc4.color, t4Change: pc4.text, t4ChangeClass: pc4.cls, t4Img: pr[3].imageUrl,
-            }, `${dateStr}_05_era.png`);
+            }, `${dateStr}_05_era.jpg`);
         }
 
         // ═══════════════════════════════════════════════
@@ -306,7 +306,7 @@ async function renderCarousel(finalData, outputDir) {
             c1Img: cold[0]?.imageUrl || '', c1Name: cold[0]?.playerName || '-', c1Team: cold[0]?.teamName || '-', c1Avg: cold[0]?.recentAvg || '-', c1Delta: cold[0]?.deltaStr || '-',
             c2Img: cold[1]?.imageUrl || '', c2Name: cold[1]?.playerName || '-', c2Team: cold[1]?.teamName || '-', c2Avg: cold[1]?.recentAvg || '-', c2Delta: cold[1]?.deltaStr || '-',
             c3Img: cold[2]?.imageUrl || '', c3Name: cold[2]?.playerName || '-', c3Team: cold[2]?.teamName || '-', c3Avg: cold[2]?.recentAvg || '-', c3Delta: cold[2]?.deltaStr || '-',
-        }, `${dateStr}_06_hotcold.png`);
+        }, `${dateStr}_06_hotcold.jpg`);
 
         // ═══════════════════════════════════════════════
         // 슬라이드 7: 주간 MVP 리더 ⭐ NEW
@@ -318,7 +318,7 @@ async function renderCarousel(finalData, outputDir) {
             w2Img: wm[1]?.imageUrl || '', w2Name: wm[1]?.playerName || '-', w2Team: wm[1]?.teamName || '-', w2Score: wm[1]?.weeklyScore || '-', w2Games: wm[1]?.games || 0, w2Color: getTeamColor(wm[1]?.teamName).color,
             w3Img: wm[2]?.imageUrl || '', w3Name: wm[2]?.playerName || '-', w3Team: wm[2]?.teamName || '-', w3Score: wm[2]?.weeklyScore || '-', w3Games: wm[2]?.games || 0, w3Color: getTeamColor(wm[2]?.teamName).color,
             w4Img: wm[3]?.imageUrl || '', w4Name: wm[3]?.playerName || '-', w4Team: wm[3]?.teamName || '-', w4Score: wm[3]?.weeklyScore || '-', w4Games: wm[3]?.games || 0, w4Color: getTeamColor(wm[3]?.teamName).color,
-        }, `${dateStr}_07_weekly_mvp.png`);
+        }, `${dateStr}_07_weekly_mvp.jpg`);
 
         // ═══════════════════════════════════════════════
         // 슬라이드 8: 마일스톤 알림 ⭐ NEW
@@ -339,7 +339,7 @@ async function renderCarousel(finalData, outputDir) {
             m4Img: milestones[3]?.imageUrl || '', m4Name: milestones[3]?.playerName || '-', m4Team: milestones[3]?.teamName || '-',
             m4Label: milestones[3]?.label || '', m4Current: milestones[3]?.current || 0, m4Target: milestones[3]?.target || 0,
             m4Remaining: milestones[3]?.remaining || 0, m4Progress: milestones[3]?.progress || 0, m4Display: msCount >= 4 ? 'flex' : 'none',
-        }, `${dateStr}_08_milestone.png`);
+        }, `${dateStr}_08_milestone.jpg`);
 
         // ═══════════════════════════════════════════════
         // 슬라이드 9: 핫뉴스 Top3 — 기존 유지
@@ -349,7 +349,7 @@ async function renderCarousel(finalData, outputDir) {
             n1Headline: n1.headline, n1Summary: `${n1.summary1 || ''} ${n1.summary2 || ''}`,
             n2Headline: n2.headline, n2Summary: `${n2.summary1 || ''} ${n2.summary2 || ''}`,
             n3Headline: n3.headline, n3Summary: `${n3.summary1 || ''} ${n3.summary2 || ''}`,
-        }, `${dateStr}_09_hotnews.png`);
+        }, `${dateStr}_09_hotnews.jpg`);
 
         // ═══════════════════════════════════════════════
         // 슬라이드 10: AI 경기별 승률 예측 ⭐ NEW
@@ -386,7 +386,7 @@ async function renderCarousel(finalData, outputDir) {
             }
         }
 
-        await captureSlide('ai-winrate.html', winrateData, `${dateStr}_10_ai_winrate.png`);
+        await captureSlide('ai-winrate.html', winrateData, `${dateStr}_10_ai_winrate.jpg`);
 
     } catch (e) {
         console.error("Puppeteer Render Error:", e);

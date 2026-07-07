@@ -37,18 +37,17 @@ async function withRetry(fn, maxRetries = 3, targetName = "작업") {
  * 1. 로컬 이미지를 tmpfiles.org에 업로드하여 임시 퍼블릭 URL을 받아옵니다.
  * (Instagram Graph API는 퍼블릭 URL 형태의 이미지만 처리할 수 있기 때문)
  */
-async function uploadToTmpFiles(imagePath) {
+async function uploadToUguu(imagePath) {
     const form = new FormData();
-    form.append('file', fs.createReadStream(imagePath));
+    form.append('files[]', fs.createReadStream(imagePath));
 
     return await withRetry(async () => {
-        const response = await axios.post('https://tmpfiles.org/api/v1/upload', form, {
+        const response = await axios.post('https://uguu.se/upload.php', form, {
             headers: form.getHeaders(),
             maxContentLength: Infinity,
             maxBodyLength: Infinity
         });
-        // tmpfiles.org 응답 URL을 직접 다운로드 URL로 변환
-        return response.data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+        return response.data.files[0].url;
     }, 3, `이미지 업로드(${path.basename(imagePath)})`);
 }
 
@@ -131,7 +130,7 @@ async function publishToInstagram(imagePaths, caption, commentText) {
     const imageUrls = [];
     console.log(`[Instagram-1] ${imagePaths.length}장의 이미지를 업로드 호스팅 서버로 임시 전송 중...`);
     for (let i = 0; i < imagePaths.length; i++) {
-        const url = await uploadToTmpFiles(imagePaths[i]);
+        const url = await uploadToUguu(imagePaths[i]);
         imageUrls.push(url);
         // console.log(`  └ 업로드 성공: ${url}`);
         await delay(1000); 

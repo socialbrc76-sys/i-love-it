@@ -49,5 +49,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kbo-carousel-images
-          path: output/*.png
+          path: output/*.jpg
           retention-days: 7

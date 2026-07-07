@@ -1,4 +1,4 @@
-﻿const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
 // NOTE: Initialize with api_key from environment variable
 // Ensure process.env.GEMINI_API_KEY is set
@@ -53,47 +53,34 @@ ${newsTextList}
     },
 
     /**
-     * AI 선발 타자 예측 (내일 터질 타자)
+     * AI 경기별 승률 예측 (내일 전 경기)
      */
-    async predictTomorrowHitter(todayPlayerStats, tomorrowSchedule, dateStr, nextDateStr, headToHeadStats = null) {
+    async predictMatchWinRates(tomorrowSchedule, dateStr, nextDateStr) {
         if (!process.env.GEMINI_API_KEY) {
             console.warn("GEMINI_API_KEY is not set.");
-            return null;
+            return [];
         }
 
-        // 환각 방지: 데이터가 들어오지 않으면 프롬프트에서 원천 차단
-        const h2hText = headToHeadStats 
-            ? `[선택된 타자와 내일 선발 투수 간의 상대 전적]\n${headToHeadStats}` 
-            : `[상대 전적 데이터 없음 — 이 항목은 분석 근거에서 절대 제외할 것]`;
+        if (!tomorrowSchedule || tomorrowSchedule.length === 0) {
+            return [];
+        }
 
-        const statTextList = todayPlayerStats.slice(0, 15).map(p => `- ${p.teamName} ${p.playerName}: MVP Score ${p.mvpScore}, 안타 ${p.hit}, 홈런 ${p.hr}, 타점 ${p.rbi}`).join('\n');
-        const scheduleText = tomorrowSchedule.map(g => `- ${g.homeTeamName} vs ${g.awayTeamName} (${g.stadium})`).join('\n');
+        const scheduleText = tomorrowSchedule.map(g => `- ${g.homeTeamName}(홈) vs ${g.awayTeamName}(원정)`).join('\n');
 
         const prompt = `
-당신은 KBO 프로야구 데이터 분석가이자 위트 있는 야구팬입니다.
+당신은 KBO 프로야구 데이터 분석가입니다.
 
-[오늘(${dateStr})의 주요 타자 데이터 (MVP 스코어순 Top 15)]
-${statTextList}
-
-[내일(${nextDateStr}) 매치업]
+[내일(${nextDateStr}) 예정 경기]
 ${scheduleText}
 
-⚠️ 중요: 아래 데이터가 제공된 경우에만 상대 전적을 근거로 언급하세요.
-제공되지 않은 데이터를 추측하거나 지어내지 마세요. 
-${h2hText}
+각 경기에 대해 홈팀 승률과 원정팀 승률을 예측해주세요.
+홈 어드밴티지, 최근 팀 폼, 시즌 성적을 종합적으로 고려하되,
+반드시 homeRate + awayRate = 100이 되어야 합니다.
 
-위 데이터를 바탕으로 "내일 경기에서 가장 기대되는 타자 1명"을 선정해주세요.
-
-[출력 형식 제한 (반드시 JSON 객체로만 반환, 마크다운 코드블록 생략)]
-{
-  "playerName": "오스틴",
-  "teamName": "LG 트윈스",
-  "expectedProbability": 82, // 1~100 사이 정수
-  "reason1": "오늘 경기 4타수 3안타 3타점으로 타격감 절정",
-  "reason2": "시즌 초반이지만 벌써 MVP 스코어 상위권 랭크",
-  "reason3": "홈/원정, 상대투수 전적 등 데이터가 있다면 반영, 없다면 최근 폼 기반 서술",
-  "fanComment": "어제 날아다니던 오스틴 봤어? 내일도 무조건 터진다 ㅋㅋㅋ 🔥"
-}
+[출력 형식 제한 (반드시 JSON 배열로만 반환, 마크다운 코드블록 생략)]
+[
+  { "home": "KT", "away": "삼성", "homeRate": 55, "awayRate": 45 }
+]
 `;
 
         try {
@@ -105,10 +92,10 @@ ${h2hText}
                 }
             });
             const textRaw = response.text;
-             return JSON.parse(textRaw);
+            return JSON.parse(textRaw);
         } catch(error) {
-             console.error("Gemini API Error (Predict):", error.message);
-             return null;
+            console.error("Gemini API Error (WinRate):", error.message);
+            return [];
         }
     },
 
@@ -127,10 +114,10 @@ ${h2hText}
         const prompt = `
 당신은 팔로워들과 친근하게 소통하는 'KBO 데이터 랩' 인스타그램 채널의 운영자(30년 차 야구팬 개발자)입니다.
 
-아래는 오늘(${finalData.date}) 생성된 9장짜리 KBO 프로야구 카드뉴스(캐러셀)의 핵심 데이터입니다:
+아래는 오늘(${finalData.date}) 생성된 10장짜리 KBO 프로야구 카드뉴스(캐러셀)의 핵심 데이터입니다:
 - 오늘의 MVP 1위: ${finalData.mvpData?.top5?.[0]?.teamName || ''} ${finalData.mvpData?.top5?.[0]?.playerName || ''} (MVP 스코어: ${finalData.mvpData?.top5?.[0]?.mvpScore || ''})
-- 내일의 AI 예측 활약 타자: ${finalData.aiPrediction?.teamName || ''} ${finalData.aiPrediction?.playerName || ''}
 - 오늘의 핫뉴스 1번: ${finalData.hotNews?.[0]?.headline || ''}
+- 시즌 MVP 스코어 Top 10 레이스, 핫/콜드 트래커, 주간 MVP 리더, 마일스톤 알림, AI 경기별 승률 예측 등 데이터 덕후 전용 심층 분석 포함
 
 이 데이터를 바탕으로 인스타그램 게시물 본문(Caption)과 첫 번째 댓글로 달릴 해시태그(Comment)를 작성해주세요.
 

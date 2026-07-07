@@ -6,6 +6,10 @@ const naverSportsAPI = require('./src/api/naverSports');
 const geminiAPI = require('./src/api/gemini');
 const { getDailyMVP } = require('./src/analysis/mvpScore');
 const { getTopBatters, getTopPitchers } = require('./src/analysis/rankings');
+const { updateSeasonMvpRace, saveSeasonMvpRace } = require('./src/analysis/seasonMvpRace');
+const { saveDailyBatters, getHotColdPlayers, loadDailyScores } = require('./src/analysis/hotCold');
+const { getWeeklyMvpLeaders } = require('./src/analysis/weeklyMvp');
+const { detectMilestones } = require('./src/analysis/milestone');
 const { renderCarousel } = require('./src/render/puppeteer');
 const { publishToInstagram } = require('./src/api/instagram');
 
@@ -33,10 +37,10 @@ async function notifyDiscord(images, dateStr) {
         return;
     }
 
-    console.log(`[6] Uploading ${images.length} images to Discord...`);
+    console.log(`[7] Uploading ${images.length} images to Discord...`);
     const form = new FormData();
     form.append('payload_json', JSON.stringify({
-        content: `🏆 **${dateStr} KBO 투데이 캐러셀 생성 완료!**\n자동화 봇이 ${images.length}장의 인스타그램용 카드를 성공적으로 생성했습니다.\n폰에서 사진을 길게 눌러 바로 저장 후 인스타에 업로드해보세요! 🚀`
+        content: `🏆 **${dateStr} KBO 투데이 캐러셀 v2 생성 완료!**\n자동화 봇이 ${images.length}장의 인스타그램용 카드를 성공적으로 생성했습니다. 🚀`
     }));
 
     images.forEach((imgRelPath, idx) => {
@@ -65,13 +69,13 @@ async function runPipeline() {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const nextDateDash = tomorrow.toISOString().split('T')[0];
 
-    console.log(`🚀 [START] KBO Carousel Pipeline for Date: ${dateDash}`);
+    console.log(`🚀 [START] KBO Carousel v2 Pipeline for Date: ${dateDash}`);
 
     try {
+        // ── 1단계: 일정 & 박스스코어 수집 ──
         console.log(`[1] Fetching Schedule & Boxscores for ${dateDash}...`);
         const games = await naverSportsAPI.getSchedule(dateDash);
         
-        // 경기가 없는 날 예외 처리
         if (!games || games.length === 0) {
             console.log(`⚠️ ${dateDash} 일자에 예정된 경기 일정이 없습니다. 작업을 종료합니다.`);
             process.exit(0);
@@ -91,7 +95,8 @@ async function runPipeline() {
             process.exit(0);
         }
 
-        console.log(`[2] Analyzing Data (MVP, Rankings)...`);
+        // ── 2단계: MVP 분석 + 시즌 누적 스탯 ──
+        console.log(`[2] Analyzing Data (MVP, Rankings, Season Stats)...`);
         const mvpData = getDailyMVP(gamesRecordData);
         
         const seasonYear = dateDash.substring(0, 4);
@@ -101,31 +106,69 @@ async function runPipeline() {
         const seasonPitchers = await naverSportsAPI.getPitcherRanking(seasonYear);
         const topPitchers = getTopPitchers(seasonPitchers);
 
-        console.log(`[3] Fetching News & Gemini Analysis...`);
+        // ── 3단계: 시즌 MVP 레이스 갱신 ──
+        console.log(`[3] Updating Season MVP Race & Daily Scores...`);
+        const { top10: seasonMvpTop10, newEntries: seasonMvpNewEntries } = updateSeasonMvpRace(mvpData.top5, dateDash, gamesRecordData);
+        saveSeasonMvpRace(seasonMvpTop10);
+
+        // 일별 타자 성적 저장 (핫/콜드 & 주간 MVP용)
+        // 전 경기 타자 기록 추출
+        const allBatters = [];
+        for (const game of gamesRecordData) {
+            const { gameInfo, recordData } = game;
+            for (const teamType of ['away', 'home']) {
+                const batters = (recordData.battersBoxscore && recordData.battersBoxscore[teamType]) || [];
+                for (const batter of batters) {
+                    if (batter.ab > 0 || batter.bb > 0) {
+                        allBatters.push({
+                            ...batter,
+                            playerName: batter.name,
+                            teamName: gameInfo[`${teamType}TeamName`],
+                            mvpScore: mvpData.top5.find(p => p.playerName === batter.name)?.mvpScore || 0,
+                        });
+                    }
+                }
+            }
+        }
+        const dailyData = saveDailyBatters(allBatters, dateDash);
+
+        // ── 4단계: 니치 분석 (핫/콜드, 주간 MVP, 마일스톤) ──
+        console.log(`[4] Running Niche Analytics (Hot/Cold, Weekly MVP, Milestones)...`);
+        const hotCold = getHotColdPlayers(dailyData);
+        const weeklyMvpLeaders = getWeeklyMvpLeaders();
+        const milestones = detectMilestones(seasonHitters, seasonPitchers);
+
+        // ── 5단계: Gemini AI 분석 (뉴스 큐레이션 + 경기별 승률) ──
+        console.log(`[5] Fetching News & Gemini AI Analysis...`);
         const recentNews = await naverSportsAPI.getNews(dateStr);
         const nextDaySchedule = await naverSportsAPI.getSchedule(nextDateDash);
         
-        // Gemini API 호출 (병렬)
-        const [hotNewsList, aiPrediction] = await Promise.all([
+        const [hotNewsList, aiWinRates] = await Promise.all([
             geminiAPI.pickTop3News(recentNews, dateDash),
-            geminiAPI.predictTomorrowHitter(mvpData.top5, nextDaySchedule, dateDash, nextDateDash, null)
+            geminiAPI.predictMatchWinRates(nextDaySchedule, dateDash, nextDateDash)
         ]);
 
-        console.log(`[4] Data Pipeline Complete! Saving intermediate JSON...`);
+        // ── 6단계: 최종 데이터 조립 & 렌더링 ──
+        console.log(`[6] Rendering 10 HTML templates to PNG via Puppeteer...`);
         const finalData = {
             date: dateDash,
             mvpData,
             battingRace: topBatters,
             pitcherRace: topPitchers,
+            seasonMvpTop10,
+            seasonMvpNewEntries,
+            hotCold,
+            weeklyMvpLeaders,
+            milestones,
             hotNews: hotNewsList,
-            aiPrediction
+            aiWinRates,
+            nextDaySchedule,
         };
         fs.writeFileSync(path.join(outputDir, `data_${dateStr}.json`), JSON.stringify(finalData, null, 2));
 
-        console.log(`[5] Rendering HTML templates to PNG via Puppeteer...`);
         const generatedImages = await renderCarousel(finalData, outputDir);
         
-        console.log(`✅ [SUCCESS] 10 Cards generated!`);
+        console.log(`✅ [SUCCESS] ${generatedImages.length} Cards generated!`);
         generatedImages.forEach((img, idx) => {
             console.log(`  ${idx + 1}. ${img}`);
         });
@@ -134,8 +177,7 @@ async function runPipeline() {
         await notifyDiscord(generatedImages, dateDash);
 
         // Instagram 동적 캡션 + 해시태그 댓글 생성
-        console.log(`[5-1] Gemini 기반 인스타그램 캡션/해시태그 생성 (보조)...`);
-        const idx = generatedImages[0].indexOf('/output/');
+        console.log(`[8] Gemini 기반 인스타그램 캡션/해시태그 생성...`);
         const igData = await geminiAPI.generateInstagramCaption(finalData);
 
         const imagePaths = generatedImages.map(imgRelPath => {

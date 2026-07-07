@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700;1,800&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(165deg, #0a0e27 0%, #0d1333 25%, #111a40 50%, #0d1333 75%, #0a0e27 100%);
+    position: relative;
+}
+
+/* Background decorations */
+.bg-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    z-index: 0;
+}
+.bg-glow.gold { background: #d4a54a; top: -100px; right: -100px; }
+.bg-glow.blue { background: #3b5ccc; bottom: -50px; left: -100px; opacity: 0.1; }
+
+/* Grid pattern overlay */
+.grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 1;
+}
+
+/* Header */
+.header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding-top: 60px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #d4a54a 0%, #f5d380 50%, #d4a54a 100%);
+    color: #0a0e27;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: 3px;
+    padding: 10px 32px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 20px rgba(212,165,74,0.4);
+}
+
+.title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 58px;
+    color: #ffffff;
+    margin-top: 22px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.subtitle {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 26px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+}
+
+/* Cards Grid */
+.cards-grid {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 36px 48px;
+    margin-top: 10px;
+}
+
+.player-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 28px 22px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s;
+}
+
+.player-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--team-color, #666);
+    border-radius: 20px 20px 0 0;
+}
+
+/* 1st place gold card */
+.player-card.rank-1 {
+    border: 2px solid rgba(212,165,74,0.6);
+    background: linear-gradient(145deg, rgba(212,165,74,0.12) 0%, rgba(212,165,74,0.03) 100%);
+    box-shadow: 0 0 30px rgba(212,165,74,0.15), inset 0 0 30px rgba(212,165,74,0.05);
+}
+.player-card.rank-1::before {
+    height: 5px;
+    background: linear-gradient(90deg, #d4a54a, #f5d380, #d4a54a);
+    box-shadow: 0 0 15px rgba(212,165,74,0.5);
+}
+
+.rank-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: #0a0e27;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6);
+}
+.rank-1 .rank-badge {
+    background: linear-gradient(135deg, #d4a54a, #f5d380);
+    color: #0a0e27;
+    box-shadow: 0 0 12px rgba(212,165,74,0.4);
+}
+.rank-2 .rank-badge {
+    background: linear-gradient(135deg, #a8b4c4, #d0d8e4);
+    color: #0a0e27;
+}
+.rank-3 .rank-badge {
+    background: linear-gradient(135deg, #c47a3a, #e0a060);
+    color: #0a0e27;
+}
+
+.player-img-wrapper {
+    width: 150px;
+    height: 150px;
+    margin: 8px auto 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.1);
+    position: relative;
+}
+.rank-1 .player-img-wrapper {
+    border-color: rgba(212,165,74,0.5);
+    box-shadow: 0 0 20px rgba(212,165,74,0.2);
+}
+
+.player-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.player-name {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.player-team {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: var(--team-color, rgba(255,255,255,0.5));
+    margin-bottom: 16px;
+}
+
+.score-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.mvp-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    color: #d4a54a;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(212,165,74,0.3);
+}
+.mvp-score-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.games-played {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+}
+
+/* Slide number */
+.slide-num {
+    position: absolute;
+    top: 32px;
+    right: 40px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: rgba(255,255,255,0.25);
+    z-index: 10;
+    letter-spacing: 1px;
+}
+
+/* Footer */
+.footer { position: absolute; bottom: 35px; width: 100%; text-align: center; z-index: 10; }
+.footer-inner { display: inline-flex; align-items: center; gap: 12px; }
+.footer-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+.footer-text .neon { color: #c084fc; text-shadow: 0 0 10px rgba(192,132,252,0.6); font-style: italic; }
+
+/* Star decorations */
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    z-index: 1;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow gold"></div>
+<div class="bg-glow blue"></div>
+<div class="grid-overlay"></div>
+
+<!-- Decorative stars -->
+<div class="star" style="top:120px;left:80px;opacity:0.5;"></div>
+<div class="star" style="top:200px;left:920px;opacity:0.3;width:4px;height:4px;"></div>
+<div class="star" style="top:600px;left:50px;opacity:0.4;"></div>
+<div class="star" style="top:900px;right:120px;opacity:0.3;width:5px;height:5px;"></div>
+<div class="star" style="top:1100px;left:200px;opacity:0.2;"></div>
+
+<div class="slide-num">{{slideNum}}/10</div>
+
+<div class="header">
+    <div class="badge">🏆 WEEKLY MVP</div>
+    <div class="title">이번 주 진짜 일한 남자 💪</div>
+    <div class="subtitle">최근 7일 누적 MVP 스코어 Top 4</div>
+</div>
+
+<div class="cards-grid">
+    <!-- Player 1 (Gold) -->
+    <div class="player-card rank-1" style="--team-color: {{w1Color}};">
+        <div class="rank-badge">1</div>
+        <div class="player-img-wrapper">
+            <img src="{{w1Img}}" alt="{{w1Name}}">
+        </div>
+        <div class="player-name">{{w1Name}}</div>
+        <div class="player-team">{{w1Team}}</div>
+        <div class="score-section">
+            <div class="mvp-score-label">MVP SCORE</div>
+            <div class="mvp-score">{{w1Score}}</div>
+            <div class="games-played">{{w1Games}}경기 출전</div>
+        </div>
+    </div>
+
+    <!-- Player 2 -->
+    <div class="player-card rank-2" style="--team-color: {{w2Color}};">
+        <div class="rank-badge">2</div>
+        <div class="player-img-wrapper">
+            <img src="{{w2Img}}" alt="{{w2Name}}">
+        </div>
+        <div class="player-name">{{w2Name}}</div>
+        <div class="player-team">{{w2Team}}</div>
+        <div class="score-section">
+            <div class="mvp-score-label">MVP SCORE</div>
+            <div class="mvp-score">{{w2Score}}</div>
+            <div class="games-played">{{w2Games}}경기 출전</div>
+        </div>
+    </div>
+
+    <!-- Player 3 -->
+    <div class="player-card rank-3" style="--team-color: {{w3Color}};">
+        <div class="rank-badge">3</div>
+        <div class="player-img-wrapper">
+            <img src="{{w3Img}}" alt="{{w3Name}}">
+        </div>
+        <div class="player-name">{{w3Name}}</div>
+        <div class="player-team">{{w3Team}}</div>
+        <div class="score-section">
+            <div class="mvp-score-label">MVP SCORE</div>
+            <div class="mvp-score">{{w3Score}}</div>
+            <div class="games-played">{{w3Games}}경기 출전</div>
+        </div>
+    </div>
+
+    <!-- Player 4 -->
+    <div class="player-card rank-4" style="--team-color: {{w4Color}};">
+        <div class="rank-badge">4</div>
+        <div class="player-img-wrapper">
+            <img src="{{w4Img}}" alt="{{w4Name}}">
+        </div>
+        <div class="player-name">{{w4Name}}</div>
+        <div class="player-team">{{w4Team}}</div>
+        <div class="score-section">
+            <div class="mvp-score-label">MVP SCORE</div>
+            <div class="mvp-score">{{w4Score}}</div>
+            <div class="games-played">{{w4Games}}경기 출전</div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">@kbo_data_<span class="neon">lab</span></span> &nbsp;⚾&nbsp; KBO</span>
+    </div>
+</div>
+
+</body>
+</html>

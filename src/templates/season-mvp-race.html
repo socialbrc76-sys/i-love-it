@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #120630;
+    position: relative;
+}
+
+/* === Background === */
+.bg-gradient {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 30% at 50% 0%, rgba(251,191,36,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #120630 0%, #1a0845 50%, #120630 100%);
+    z-index: 0;
+}
+
+.bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px);
+    z-index: 1;
+}
+
+/* === Slide Badge === */
+.slide-badge {
+    position: absolute;
+    top: 36px;
+    right: 40px;
+    z-index: 10;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    backdrop-filter: blur(6px);
+}
+
+/* === Header Area === */
+.header {
+    position: relative;
+    z-index: 5;
+    padding: 44px 50px 0;
+    text-align: center;
+}
+
+.header-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15));
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 24px;
+    padding: 6px 22px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: #fbbf24;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.header-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 52px;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.header-subtitle {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 30px;
+}
+
+/* === Bar Chart === */
+.chart {
+    position: relative;
+    z-index: 5;
+    padding: 0 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 72px;
+}
+
+.bar-row.rank-1 {
+    height: 88px;
+    margin-bottom: 6px;
+}
+
+.bar-rank {
+    width: 40px;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 28px;
+    color: rgba(255,255,255,0.4);
+    flex-shrink: 0;
+}
+
+.bar-row.rank-1 .bar-rank {
+    font-size: 36px;
+    color: #fbbf24;
+}
+
+.bar-content {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    opacity: 0.25;
+    transition: width 0.6s ease;
+}
+
+.bar-row.rank-1 .bar-fill {
+    opacity: 0.35;
+}
+
+.bar-info {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bar-crown {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.bar-name {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: #fff;
+}
+
+.bar-row.rank-1 .bar-name {
+    font-size: 32px;
+}
+
+.bar-team {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+}
+
+.bar-row.rank-1 .bar-team {
+    font-size: 22px;
+}
+
+.bar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.bar-date {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: rgba(255,255,255,0.3);
+}
+
+.bar-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 32px;
+    color: #fff;
+    min-width: 60px;
+    text-align: right;
+}
+
+.bar-row.rank-1 .bar-score {
+    font-size: 40px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* === NEW Badge === */
+.new-badge {
+    display: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #34d399;
+    background: rgba(52,211,153,0.15);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 8px;
+    padding: 2px 10px;
+    animation: pulse-new 1.5s ease-in-out infinite;
+    white-space: nowrap;
+}
+
+.new-badge.show {
+    display: inline-block;
+}
+
+@keyframes pulse-new {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* === Gold Accent Line for #1 === */
+.gold-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+    z-index: 2;
+    opacity: 0.5;
+}
+
+/* === Footer === */
+.footer { position: absolute; bottom: 35px; width: 100%; text-align: center; z-index: 10; }
+.footer-inner { display: inline-flex; align-items: center; gap: 12px; }
+.footer-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+.footer-text .neon { color: #c084fc; text-shadow: 0 0 10px rgba(192,132,252,0.6); font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-gradient"></div>
+<div class="bg-pattern"></div>
+
+<!-- Slide Number -->
+<div class="slide-badge">{{slideNum}}/10</div>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-badge">SEASON MVP RACE</div>
+    <div class="header-title">시즌 최고 MVP 스코어 🏆</div>
+    <div class="header-subtitle">역대 단일 경기 최고 스코어 Top 10</div>
+</div>
+
+<!-- Bar Chart -->
+<div class="chart">
+
+    <!-- Rank 1 -->
+    <div class="bar-row rank-1">
+        <div class="bar-rank">1</div>
+        <div class="bar-content">
+            <div class="gold-accent"></div>
+            <div class="bar-fill" style="width: {{r1Width}}%; background: {{r1Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-crown">👑</span>
+                    <span class="bar-name">{{r1Name}}</span>
+                    <span class="bar-team">{{r1Team}}</span>
+                    <span class="new-badge {{r1New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r1Date}}</span>
+                    <span class="bar-score">{{r1Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 2 -->
+    <div class="bar-row">
+        <div class="bar-rank">2</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r2Width}}%; background: {{r2Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r2Name}}</span>
+                    <span class="bar-team">{{r2Team}}</span>
+                    <span class="new-badge {{r2New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r2Date}}</span>
+                    <span class="bar-score">{{r2Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 3 -->
+    <div class="bar-row">
+        <div class="bar-rank">3</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r3Width}}%; background: {{r3Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r3Name}}</span>
+                    <span class="bar-team">{{r3Team}}</span>
+                    <span class="new-badge {{r3New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r3Date}}</span>
+                    <span class="bar-score">{{r3Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 4 -->
+    <div class="bar-row">
+        <div class="bar-rank">4</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r4Width}}%; background: {{r4Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r4Name}}</span>
+                    <span class="bar-team">{{r4Team}}</span>
+                    <span class="new-badge {{r4New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r4Date}}</span>
+                    <span class="bar-score">{{r4Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 5 -->
+    <div class="bar-row">
+        <div class="bar-rank">5</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r5Width}}%; background: {{r5Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r5Name}}</span>
+                    <span class="bar-team">{{r5Team}}</span>
+                    <span class="new-badge {{r5New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r5Date}}</span>
+                    <span class="bar-score">{{r5Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 6 -->
+    <div class="bar-row">
+        <div class="bar-rank">6</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r6Width}}%; background: {{r6Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r6Name}}</span>
+                    <span class="bar-team">{{r6Team}}</span>
+                    <span class="new-badge {{r6New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r6Date}}</span>
+                    <span class="bar-score">{{r6Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 7 -->
+    <div class="bar-row">
+        <div class="bar-rank">7</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r7Width}}%; background: {{r7Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r7Name}}</span>
+                    <span class="bar-team">{{r7Team}}</span>
+                    <span class="new-badge {{r7New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r7Date}}</span>
+                    <span class="bar-score">{{r7Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 8 -->
+    <div class="bar-row">
+        <div class="bar-rank">8</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r8Width}}%; background: {{r8Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r8Name}}</span>
+                    <span class="bar-team">{{r8Team}}</span>
+                    <span class="new-badge {{r8New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r8Date}}</span>
+                    <span class="bar-score">{{r8Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 9 -->
+    <div class="bar-row">
+        <div class="bar-rank">9</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r9Width}}%; background: {{r9Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r9Name}}</span>
+                    <span class="bar-team">{{r9Team}}</span>
+                    <span class="new-badge {{r9New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r9Date}}</span>
+                    <span class="bar-score">{{r9Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank 10 -->
+    <div class="bar-row">
+        <div class="bar-rank">10</div>
+        <div class="bar-content">
+            <div class="bar-fill" style="width: {{r10Width}}%; background: {{r10Color}};"></div>
+            <div class="bar-info">
+                <div class="bar-left">
+                    <span class="bar-name">{{r10Name}}</span>
+                    <span class="bar-team">{{r10Team}}</span>
+                    <span class="new-badge {{r10New}}">🆕 NEW!</span>
+                </div>
+                <div class="bar-right">
+                    <span class="bar-date">{{r10Date}}</span>
+                    <span class="bar-score">{{r10Score}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">@kbo_data_<span class="neon">lab</span></span> &nbsp;⚾&nbsp; KBO</span>
+    </div>
+</div>
+
+</body>
+</html>

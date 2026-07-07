@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #120630;
+    position: relative;
+}
+
+/* === Background === */
+.bg-base {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #120630 0%, #1a0845 50%, #120630 100%);
+    z-index: 0;
+}
+
+.bg-hot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse 100% 60% at 20% 50%, rgba(239,68,68,0.1) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 40% at 40% 30%, rgba(249,115,22,0.08) 0%, transparent 60%);
+    z-index: 1;
+}
+
+.bg-cold {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse 100% 60% at 80% 50%, rgba(56,189,248,0.1) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 40% at 60% 70%, rgba(99,102,241,0.08) 0%, transparent 60%);
+    z-index: 1;
+}
+
+.bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px);
+    z-index: 2;
+}
+
+/* Center divider line */
+.center-divider {
+    position: absolute;
+    top: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 980px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 80%, transparent);
+    z-index: 3;
+}
+
+/* === Slide Badge === */
+.slide-badge {
+    position: absolute;
+    top: 36px;
+    right: 40px;
+    z-index: 10;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    backdrop-filter: blur(6px);
+}
+
+/* === Header === */
+.header {
+    position: relative;
+    z-index: 5;
+    padding: 44px 50px 0;
+    text-align: center;
+}
+
+.header-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(99,102,241,0.15));
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 24px;
+    padding: 6px 22px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: #a78bfa;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.header-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 56px;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.header-subtitle {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 24px;
+}
+
+/* === Column Labels === */
+.columns-header {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    padding: 0 40px;
+    margin-bottom: 16px;
+}
+
+.col-label {
+    flex: 1;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 34px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.col-label.hot {
+    color: #f97316;
+    text-shadow: 0 0 20px rgba(249,115,22,0.4);
+}
+
+.col-label.cold {
+    color: #38bdf8;
+    text-shadow: 0 0 20px rgba(56,189,248,0.4);
+}
+
+/* === Cards Container === */
+.columns {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    padding: 0 30px;
+    gap: 16px;
+}
+
+.column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* === Player Card === */
+.player-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+    height: 240px;
+}
+
+.player-card.hot-card {
+    border-color: rgba(249,115,22,0.15);
+    background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(249,115,22,0.04));
+}
+
+.player-card.cold-card {
+    border-color: rgba(56,189,248,0.15);
+    background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(99,102,241,0.04));
+}
+
+.player-card .card-rank {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(255,255,255,0.2);
+}
+
+.card-img-wrapper {
+    width: 140px;
+    height: 180px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.card-img-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    border-radius: 12px;
+}
+
+.card-img-glow {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    filter: blur(25px);
+    z-index: 0;
+}
+
+.hot-card .card-img-glow {
+    background: radial-gradient(circle, rgba(249,115,22,0.2), transparent 70%);
+}
+
+.cold-card .card-img-glow {
+    background: radial-gradient(circle, rgba(56,189,248,0.2), transparent 70%);
+}
+
+.card-img-wrapper img {
+    position: relative;
+    z-index: 1;
+}
+
+.card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.card-team {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+}
+
+.card-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 36px;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.card-avg-label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 4px;
+}
+
+.card-avg {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    color: #fff;
+    line-height: 1;
+}
+
+.card-delta {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.card-delta.up {
+    color: #34d399;
+}
+
+.card-delta.down {
+    color: #f87171;
+}
+
+/* === Footer === */
+.footer { position: absolute; bottom: 35px; width: 100%; text-align: center; z-index: 10; }
+.footer-inner { display: inline-flex; align-items: center; gap: 12px; }
+.footer-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+.footer-text .neon { color: #c084fc; text-shadow: 0 0 10px rgba(192,132,252,0.6); font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-base"></div>
+<div class="bg-hot"></div>
+<div class="bg-cold"></div>
+<div class="bg-pattern"></div>
+<div class="center-divider"></div>
+
+<!-- Slide Number -->
+<div class="slide-badge">{{slideNum}}/10</div>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-badge">7-DAY TRACKER</div>
+    <div class="header-title">핫 🔥 vs 콜드 🧊</div>
+    <div class="header-subtitle">최근 7일 타율 변동 트래커</div>
+</div>
+
+<!-- Column Labels -->
+<div class="columns-header">
+    <div class="col-label hot">🔥 HOT</div>
+    <div class="col-label cold">🧊 COLD</div>
+</div>
+
+<!-- Player Cards -->
+<div class="columns">
+
+    <!-- HOT Column -->
+    <div class="column">
+
+        <!-- Hot Player 1 -->
+        <div class="player-card hot-card">
+            <span class="card-rank">#1</span>
+            <div class="card-img-wrapper">
+                <div class="card-img-glow"></div>
+                <img src="{{h1Img}}" alt="Hot Player 1">
+            </div>
+            <div class="card-info">
+                <div class="card-team">{{h1Team}}</div>
+                <div class="card-name">{{h1Name}}</div>
+                <div class="card-avg-label">7일 타율</div>
+                <div class="card-avg">{{h1Avg}}</div>
+                <div class="card-delta up">▲{{h1Delta}}</div>
+            </div>
+        </div>
+
+        <!-- Hot Player 2 -->
+        <div class="player-card hot-card">
+            <span class="card-rank">#2</span>
+            <div class="card-img-wrapper">
+                <div class="card-img-glow"></div>
+                <img src="{{h2Img}}" alt="Hot Player 2">
+            </div>
+            <div class="card-info">
+                <div class="card-team">{{h2Team}}</div>
+                <div class="card-name">{{h2Name}}</div>
+                <div class="card-avg-label">7일 타율</div>
+                <div class="card-avg">{{h2Avg}}</div>
+                <div class="card-delta up">▲{{h2Delta}}</div>
+            </div>
+        </div>
+
+        <!-- Hot Player 3 -->
+        <div class="player-card hot-card">
+            <span class="card-rank">#3</span>
+            <div class="card-img-wrapper">
+                <div class="card-img-glow"></div>
+                <img src="{{h3Img}}" alt="Hot Player 3">
+            </div>
+            <div class="card-info">
+                <div class="card-team">{{h3Team}}</div>
+                <div class="card-name">{{h3Name}}</div>
+                <div class="card-avg-label">7일 타율</div>
+                <div class="card-avg">{{h3Avg}}</div>
+                <div class="card-delta up">▲{{h3Delta}}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- COLD Column -->
+    <div class="column">
+
+        <!-- Cold Player 1 -->
+        <div class="player-card cold-card">
+            <span class="card-rank">#1</span>
+            <div class="card-img-wrapper">
+                <div class="card-img-glow"></div>
+                <img src="{{c1Img}}" alt="Cold Player 1">
+            </div>
+            <div class="card-info">
+                <div class="card-team">{{c1Team}}</div>
+                <div class="card-name">{{c1Name}}</div>
+                <div class="card-avg-label">7일 타율</div>
+                <div class="card-avg">{{c1Avg}}</div>
+                <div class="card-delta down">▼{{c1Delta}}</div>
+            </div>
+        </div>
+
+        <!-- Cold Player 2 -->
+        <div class="player-card cold-card">
+            <span class="card-rank">#2</span>
+            <div class="card-img-wrapper">
+                <div class="card-img-glow"></div>
+                <img src="{{c2Img}}" alt="Cold Player 2">
+            </div>
+            <div class="card-info">
+                <div class="card-team">{{c2Team}}</div>
+                <div class="card-name">{{c2Name}}</div>
+                <div class="card-avg-label">7일 타율</div>
+                <div class="card-avg">{{c2Avg}}</div>
+                <div class="card-delta down">▼{{c2Delta}}</div>
+            </div>
+        </div>
+
+        <!-- Cold Player 3 -->
+        <div class="player-card cold-card">
+            <span class="card-rank">#3</span>
+            <div class="card-img-wrapper">
+                <div class="card-img-glow"></div>
+                <img src="{{c3Img}}" alt="Cold Player 3">
+            </div>
+            <div class="card-info">
+                <div class="card-team">{{c3Team}}</div>
+                <div class="card-name">{{c3Name}}</div>
+                <div class="card-avg-label">7일 타율</div>
+                <div class="card-avg">{{c3Avg}}</div>
+                <div class="card-delta down">▼{{c3Delta}}</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">@kbo_data_<span class="neon">lab</span></span> &nbsp;⚾&nbsp; KBO</span>
+    </div>
+</div>
+
+</body>
+</html>

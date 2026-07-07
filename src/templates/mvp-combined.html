@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #120630;
+    position: relative;
+}
+
+/* === Background Effects === */
+.bg-gradient {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% 30%, {{mvpColorAlpha}} 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 30% 60%, rgba(139,92,246,0.12) 0%, transparent 60%),
+        linear-gradient(180deg, #120630 0%, #1a0845 40%, #120630 100%);
+    z-index: 0;
+}
+
+.bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px);
+    z-index: 1;
+}
+
+/* === Slide Number Badge === */
+.slide-badge {
+    position: absolute;
+    top: 36px;
+    right: 40px;
+    z-index: 10;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    backdrop-filter: blur(6px);
+}
+
+/* === Date Badge === */
+.date-badge {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    z-index: 10;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* === Top Section: MVP Spotlight === */
+.mvp-section {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    height: 780px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 30px;
+}
+
+.mvp-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, {{mvpColorAlpha}} 0%, transparent 70%);
+    filter: blur(40px);
+    z-index: 0;
+}
+
+.mvp-image-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 420px;
+    height: 480px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.mvp-image-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 40px rgba(0,0,0,0.6));
+}
+
+.mvp-label {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 140px;
+    letter-spacing: -3px;
+    color: rgba(255,255,255,0.04);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.mvp-info {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+}
+
+.mvp-team {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: {{mvpColor}};
+    margin-bottom: 4px;
+}
+
+.mvp-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 64px;
+    color: #fff;
+    line-height: 1.1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    margin-bottom: 8px;
+}
+
+.mvp-score-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 4px;
+}
+
+.mvp-score-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 24px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.mvp-score-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 56px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+/* === Stats Row === */
+.stats-row {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 40px;
+    margin: 0 60px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+}
+
+.stat-item {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 0 14px;
+}
+
+.stat-item:not(:last-child) {
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    color: #fff;
+    line-height: 1;
+}
+
+.stat-label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    color: rgba(255,255,255,0.4);
+}
+
+/* === Bottom Section: Innings Strip === */
+.innings-section {
+    position: relative;
+    z-index: 5;
+    margin-top: 28px;
+    padding: 0 40px;
+}
+
+.innings-header {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 14px;
+    padding-left: 4px;
+}
+
+.innings-strip {
+    display: flex;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.innings-strip .inning-cell {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.innings-strip .inning-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: rgba(255,255,255,0.3);
+}
+
+.innings-strip .inning-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: #fff;
+}
+
+.innings-strip .inning-cell.highlight {
+    background: rgba(192,132,252,0.15);
+    border-color: rgba(192,132,252,0.3);
+}
+
+/* === Footer === */
+.footer { position: absolute; bottom: 35px; width: 100%; text-align: center; z-index: 10; }
+.footer-inner { display: inline-flex; align-items: center; gap: 12px; }
+.footer-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+.footer-text .neon { color: #c084fc; text-shadow: 0 0 10px rgba(192,132,252,0.6); font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-gradient"></div>
+<div class="bg-pattern"></div>
+
+<!-- Slide Number -->
+<div class="slide-badge">{{slideNum}}/10</div>
+
+<!-- Date -->
+<div class="date-badge">{{dateDisplay}}</div>
+
+<!-- MVP Spotlight -->
+<div class="mvp-section">
+    <div class="mvp-label">MVP OF THE DAY</div>
+    <div class="mvp-glow"></div>
+
+    <div class="mvp-image-wrapper">
+        <img src="{{mvpImg}}" alt="MVP Player">
+    </div>
+
+    <div class="mvp-info">
+        <div class="mvp-team">{{teamName}}</div>
+        <div class="mvp-name">{{playerName}}</div>
+        <div class="mvp-score-row">
+            <span class="mvp-score-label">MVP Score</span>
+            <span class="mvp-score-value">{{mvpScore}}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-item">
+        <span class="stat-value">{{ab}}</span>
+        <span class="stat-label">타수</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value">{{hit}}</span>
+        <span class="stat-label">안타</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value">{{hr}}</span>
+        <span class="stat-label">홈런</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value">{{rbi}}</span>
+        <span class="stat-label">타점</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value">{{run}}</span>
+        <span class="stat-label">득점</span>
+    </div>
+</div>
+
+<!-- Innings Strip -->
+<div class="innings-section">
+    <div class="innings-header">Inning Results</div>
+    <div class="innings-strip">
+        {{inningItems}}
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">@kbo_data_<span class="neon">lab</span></span> &nbsp;⚾&nbsp; KBO</span>
+    </div>
+</div>
+
+</body>
+</html>

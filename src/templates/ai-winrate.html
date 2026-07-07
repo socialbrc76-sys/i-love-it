@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700;1,800&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(170deg, #06091a 0%, #0a1028 30%, #0e1535 60%, #0a1028 100%);
+    position: relative;
+}
+
+/* Background effects */
+.bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+}
+.bg-glow.cyan { width: 500px; height: 500px; background: #00b4d8; opacity: 0.07; top: -50px; right: -100px; }
+.bg-glow.blue { width: 450px; height: 450px; background: #3a6df0; opacity: 0.06; bottom: 100px; left: -120px; }
+.bg-glow.electric { width: 300px; height: 300px; background: #00f0ff; opacity: 0.04; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+.grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0,180,216,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,180,216,0.015) 1px, transparent 1px);
+    background-size: 54px 54px;
+    z-index: 1;
+}
+
+/* Circuit-like decorative lines */
+.circuit-line {
+    position: absolute;
+    z-index: 1;
+}
+.circuit-line.h {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,180,216,0.15), transparent);
+}
+.circuit-line.v {
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(0,180,216,0.1), transparent);
+}
+
+/* Header */
+.header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding-top: 50px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #00b4d8 0%, #3a6df0 100%);
+    color: #ffffff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 26px;
+    letter-spacing: 3px;
+    padding: 10px 28px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 25px rgba(0,180,216,0.3);
+}
+
+.badge .ai-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 52px;
+    color: #ffffff;
+    margin-top: 18px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.subtitle {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 6px;
+}
+
+/* Match Cards */
+.matches {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 28px 48px;
+    margin-top: 6px;
+}
+
+.match-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(0,180,216,0.1);
+    border-radius: 16px;
+    padding: 22px 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.match-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,180,216,0.25), transparent);
+}
+
+.match-teams {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.team.home { flex-direction: row; }
+.team.away { flex-direction: row-reverse; }
+
+.team-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--dot-color);
+}
+
+.team-name {
+    font-weight: 900;
+    font-size: 26px;
+    color: #ffffff;
+}
+
+.vs-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+}
+
+/* Win rate bar */
+.rate-bar-container {
+    width: 100%;
+    height: 38px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+    background: rgba(255,255,255,0.04);
+}
+
+.rate-bar-home {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: width 0.5s ease;
+}
+
+.rate-bar-away {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    position: relative;
+    transition: width 0.5s ease;
+}
+
+.rate-bar-home::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(0,0,0,0.4);
+    box-shadow: 0 0 6px rgba(0,0,0,0.3);
+}
+
+.rate-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
+}
+
+/* CTA Section */
+.cta-section {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 20px 48px 0;
+}
+
+.cta-text {
+    font-weight: 700;
+    font-size: 22px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+}
+
+.cta-text .highlight {
+    color: #00d4ff;
+    text-shadow: 0 0 8px rgba(0,212,255,0.3);
+}
+
+.cta-follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.5px;
+}
+
+/* Slide number */
+.slide-num {
+    position: absolute;
+    top: 32px;
+    right: 40px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: rgba(255,255,255,0.25);
+    z-index: 10;
+    letter-spacing: 1px;
+}
+
+/* Footer */
+.footer { position: absolute; bottom: 35px; width: 100%; text-align: center; z-index: 10; }
+.footer-inner { display: inline-flex; align-items: center; gap: 12px; }
+.footer-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+.footer-text .neon { color: #c084fc; text-shadow: 0 0 10px rgba(192,132,252,0.6); font-style: italic; }
+
+/* Decorative nodes */
+.node {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 1px solid rgba(0,180,216,0.3);
+    border-radius: 50%;
+    z-index: 1;
+}
+.node::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 2px;
+    background: rgba(0,180,216,0.5);
+    border-radius: 50%;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow cyan"></div>
+<div class="bg-glow blue"></div>
+<div class="bg-glow electric"></div>
+<div class="grid-overlay"></div>
+
+<!-- Decorative circuit lines -->
+<div class="circuit-line h" style="width:300px;top:300px;left:0;"></div>
+<div class="circuit-line h" style="width:250px;top:850px;right:0;left:auto;"></div>
+<div class="circuit-line v" style="height:200px;top:100px;left:60px;"></div>
+<div class="circuit-line v" style="height:180px;bottom:200px;right:80px;"></div>
+
+<!-- Decorative nodes -->
+<div class="node" style="top:300px;left:300px;"></div>
+<div class="node" style="top:850px;right:250px;"></div>
+<div class="node" style="top:100px;left:60px;"></div>
+
+<div class="slide-num">{{slideNum}}/10</div>
+
+<div class="header">
+    <div class="badge"><span class="ai-icon">🤖</span> AI PREDICTION</div>
+    <div class="title">내일의 승률 예측 🎰</div>
+    <div class="subtitle">{{nextDate}} 경기 AI 분석</div>
+</div>
+
+<div class="matches">
+    <!-- Game 1 -->
+    <div class="match-card" style="display: flex; flex-direction: column;">
+        <div class="match-teams">
+            <div class="team home">
+                <div class="team-color-dot" style="background: {{g1HomeColor}}; --dot-color: {{g1HomeColor}};"></div>
+                <div class="team-name">{{g1Home}}</div>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="team away">
+                <div class="team-color-dot" style="background: {{g1AwayColor}}; --dot-color: {{g1AwayColor}};"></div>
+                <div class="team-name">{{g1Away}}</div>
+            </div>
+        </div>
+        <div class="rate-bar-container">
+            <div class="rate-bar-home" style="width: {{g1HomeRate}}%; background: {{g1HomeColor}};">
+                <span class="rate-label">{{g1HomeRate}}%</span>
+            </div>
+            <div class="rate-bar-away" style="background: {{g1AwayColor}};">
+                <span class="rate-label">{{g1AwayRate}}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 2 -->
+    <div class="match-card" style="display: {{g2Display}}; flex-direction: column;">
+        <div class="match-teams">
+            <div class="team home">
+                <div class="team-color-dot" style="background: {{g2HomeColor}}; --dot-color: {{g2HomeColor}};"></div>
+                <div class="team-name">{{g2Home}}</div>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="team away">
+                <div class="team-color-dot" style="background: {{g2AwayColor}}; --dot-color: {{g2AwayColor}};"></div>
+                <div class="team-name">{{g2Away}}</div>
+            </div>
+        </div>
+        <div class="rate-bar-container">
+            <div class="rate-bar-home" style="width: {{g2HomeRate}}%; background: {{g2HomeColor}};">
+                <span class="rate-label">{{g2HomeRate}}%</span>
+            </div>
+            <div class="rate-bar-away" style="background: {{g2AwayColor}};">
+                <span class="rate-label">{{g2AwayRate}}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 3 -->
+    <div class="match-card" style="display: {{g3Display}}; flex-direction: column;">
+        <div class="match-teams">
+            <div class="team home">
+                <div class="team-color-dot" style="background: {{g3HomeColor}}; --dot-color: {{g3HomeColor}};"></div>
+                <div class="team-name">{{g3Home}}</div>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="team away">
+                <div class="team-color-dot" style="background: {{g3AwayColor}}; --dot-color: {{g3AwayColor}};"></div>
+                <div class="team-name">{{g3Away}}</div>
+            </div>
+        </div>
+        <div class="rate-bar-container">
+            <div class="rate-bar-home" style="width: {{g3HomeRate}}%; background: {{g3HomeColor}};">
+                <span class="rate-label">{{g3HomeRate}}%</span>
+            </div>
+            <div class="rate-bar-away" style="background: {{g3AwayColor}};">
+                <span class="rate-label">{{g3AwayRate}}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 4 -->
+    <div class="match-card" style="display: {{g4Display}}; flex-direction: column;">
+        <div class="match-teams">
+            <div class="team home">
+                <div class="team-color-dot" style="background: {{g4HomeColor}}; --dot-color: {{g4HomeColor}};"></div>
+                <div class="team-name">{{g4Home}}</div>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="team away">
+                <div class="team-color-dot" style="background: {{g4AwayColor}}; --dot-color: {{g4AwayColor}};"></div>
+                <div class="team-name">{{g4Away}}</div>
+            </div>
+        </div>
+        <div class="rate-bar-container">
+            <div class="rate-bar-home" style="width: {{g4HomeRate}}%; background: {{g4HomeColor}};">
+                <span class="rate-label">{{g4HomeRate}}%</span>
+            </div>
+            <div class="rate-bar-away" style="background: {{g4AwayColor}};">
+                <span class="rate-label">{{g4AwayRate}}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 5 -->
+    <div class="match-card" style="display: {{g5Display}}; flex-direction: column;">
+        <div class="match-teams">
+            <div class="team home">
+                <div class="team-color-dot" style="background: {{g5HomeColor}}; --dot-color: {{g5HomeColor}};"></div>
+                <div class="team-name">{{g5Home}}</div>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="team away">
+                <div class="team-color-dot" style="background: {{g5AwayColor}}; --dot-color: {{g5AwayColor}};"></div>
+                <div class="team-name">{{g5Away}}</div>
+            </div>
+        </div>
+        <div class="rate-bar-container">
+            <div class="rate-bar-home" style="width: {{g5HomeRate}}%; background: {{g5HomeColor}};">
+                <span class="rate-label">{{g5HomeRate}}%</span>
+            </div>
+            <div class="rate-bar-away" style="background: {{g5AwayColor}};">
+                <span class="rate-label">{{g5AwayRate}}%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="cta-text">AI의 예측, <span class="highlight">당신의 예측은?</span> 👇 댓글로 알려주세요!</div>
+    <div class="cta-follow">📲 @kbo_data_lab 팔로우</div>
+</div>
+
+<div class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">@kbo_data_<span class="neon">lab</span></span> &nbsp;⚾&nbsp; KBO</span>
+    </div>
+</div>
+
+</body>
+</html>

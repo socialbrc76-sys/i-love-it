@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700;1,800&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(170deg, #080d1e 0%, #0c1229 30%, #101832 60%, #0c1229 100%);
+    position: relative;
+}
+
+/* Background effects */
+.bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 0;
+}
+.bg-glow.cyan { width: 500px; height: 500px; background: #00e5c8; opacity: 0.06; top: 100px; left: -150px; }
+.bg-glow.green { width: 400px; height: 400px; background: #22d97e; opacity: 0.05; bottom: 200px; right: -100px; }
+
+.grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0,229,200,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,200,0.015) 1px, transparent 1px);
+    background-size: 54px 54px;
+    z-index: 1;
+}
+
+/* Scan line animation effect */
+.scanline {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 4px,
+        rgba(0,229,200,0.01) 4px,
+        rgba(0,229,200,0.01) 5px
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding-top: 55px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #00e5c8 0%, #22d97e 100%);
+    color: #080d1e;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 26px;
+    letter-spacing: 3px;
+    padding: 10px 28px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 25px rgba(0,229,200,0.35);
+}
+
+.title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 54px;
+    color: #ffffff;
+    margin-top: 20px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.subtitle {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 6px;
+}
+
+/* Milestone Items */
+.milestones {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px 48px;
+    margin-top: 8px;
+}
+
+.milestone-item {
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(0,229,200,0.12);
+    border-radius: 18px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+}
+
+.milestone-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,229,200,0.3), transparent);
+}
+
+.m-player-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(0,229,200,0.25);
+    flex-shrink: 0;
+    box-shadow: 0 0 15px rgba(0,229,200,0.1);
+}
+
+.m-player-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.m-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.m-player-line {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.m-name {
+    font-weight: 900;
+    font-size: 26px;
+    color: #ffffff;
+}
+
+.m-team {
+    font-weight: 500;
+    font-size: 17px;
+    color: rgba(255,255,255,0.4);
+}
+
+.m-label {
+    font-weight: 700;
+    font-size: 19px;
+    color: #00e5c8;
+    margin-bottom: 12px;
+    text-shadow: 0 0 10px rgba(0,229,200,0.3);
+}
+
+.m-progress-wrapper {
+    position: relative;
+    width: 100%;
+    height: 28px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.m-progress-bar {
+    height: 100%;
+    border-radius: 14px;
+    background: linear-gradient(90deg, #00e5c8, #22d97e);
+    box-shadow: 0 0 20px rgba(0,229,200,0.4), 0 0 40px rgba(0,229,200,0.15);
+    position: relative;
+    transition: width 0.6s ease;
+}
+
+.m-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25));
+    border-radius: 0 14px 14px 0;
+}
+
+.m-progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-count {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: rgba(255,255,255,0.5);
+}
+
+.m-remaining {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #ffca28;
+    text-shadow: 0 0 10px rgba(255,202,40,0.3);
+}
+
+.m-remaining .num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+}
+
+/* Visibility control via milestoneCount */
+.milestone-item.m-hide { display: none; }
+
+/* Slide number */
+.slide-num {
+    position: absolute;
+    top: 32px;
+    right: 40px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: rgba(255,255,255,0.25);
+    z-index: 10;
+    letter-spacing: 1px;
+}
+
+/* Footer */
+.footer { position: absolute; bottom: 35px; width: 100%; text-align: center; z-index: 10; }
+.footer-inner { display: inline-flex; align-items: center; gap: 12px; }
+.footer-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+.footer-text .neon { color: #c084fc; text-shadow: 0 0 10px rgba(192,132,252,0.6); font-style: italic; }
+
+/* Decorative dots */
+.dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(0,229,200,0.3);
+    z-index: 1;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow cyan"></div>
+<div class="bg-glow green"></div>
+<div class="grid-overlay"></div>
+<div class="scanline"></div>
+
+<!-- Decorative dots -->
+<div class="dot" style="top:180px;left:60px;"></div>
+<div class="dot" style="top:400px;right:80px;width:5px;height:5px;opacity:0.5;"></div>
+<div class="dot" style="top:750px;left:100px;opacity:0.4;"></div>
+<div class="dot" style="top:1050px;right:150px;opacity:0.3;"></div>
+
+<div class="slide-num">{{slideNum}}/10</div>
+
+<div class="header">
+    <div class="badge">MILESTONE ALERT 🔔</div>
+    <div class="title">기록 임박 선수 🏅</div>
+    <div class="subtitle">다음 마일스톤까지 카운트다운</div>
+</div>
+
+<div class="milestones">
+    <!-- Milestone 1 -->
+    <div class="milestone-item" style="display: {{m1Display}};">
+        <div class="m-player-img">
+            <img src="{{m1Img}}" alt="{{m1Name}}">
+        </div>
+        <div class="m-info">
+            <div class="m-player-line">
+                <span class="m-name">{{m1Name}}</span>
+                <span class="m-team">{{m1Team}}</span>
+            </div>
+            <div class="m-label">{{m1Label}}</div>
+            <div class="m-progress-wrapper">
+                <div class="m-progress-bar" style="width: {{m1Progress}}%;"></div>
+            </div>
+            <div class="m-progress-text">
+                <span class="m-count">{{m1Current}} / {{m1Target}}</span>
+                <span class="m-remaining"><span class="num">{{m1Remaining}}</span>개 남음!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestone 2 -->
+    <div class="milestone-item" style="display: {{m2Display}};">
+        <div class="m-player-img">
+            <img src="{{m2Img}}" alt="{{m2Name}}">
+        </div>
+        <div class="m-info">
+            <div class="m-player-line">
+                <span class="m-name">{{m2Name}}</span>
+                <span class="m-team">{{m2Team}}</span>
+            </div>
+            <div class="m-label">{{m2Label}}</div>
+            <div class="m-progress-wrapper">
+                <div class="m-progress-bar" style="width: {{m2Progress}}%;"></div>
+            </div>
+            <div class="m-progress-text">
+                <span class="m-count">{{m2Current}} / {{m2Target}}</span>
+                <span class="m-remaining"><span class="num">{{m2Remaining}}</span>개 남음!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestone 3 -->
+    <div class="milestone-item" style="display: {{m3Display}};">
+        <div class="m-player-img">
+            <img src="{{m3Img}}" alt="{{m3Name}}">
+        </div>
+        <div class="m-info">
+            <div class="m-player-line">
+                <span class="m-name">{{m3Name}}</span>
+                <span class="m-team">{{m3Team}}</span>
+            </div>
+            <div class="m-label">{{m3Label}}</div>
+            <div class="m-progress-wrapper">
+                <div class="m-progress-bar" style="width: {{m3Progress}}%;"></div>
+            </div>
+            <div class="m-progress-text">
+                <span class="m-count">{{m3Current}} / {{m3Target}}</span>
+                <span class="m-remaining"><span class="num">{{m3Remaining}}</span>개 남음!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestone 4 -->
+    <div class="milestone-item" style="display: {{m4Display}};">
+        <div class="m-player-img">
+            <img src="{{m4Img}}" alt="{{m4Name}}">
+        </div>
+        <div class="m-info">
+            <div class="m-player-line">
+                <span class="m-name">{{m4Name}}</span>
+                <span class="m-team">{{m4Team}}</span>
+            </div>
+            <div class="m-label">{{m4Label}}</div>
+            <div class="m-progress-wrapper">
+                <div class="m-progress-bar" style="width: {{m4Progress}}%;"></div>
+            </div>
+            <div class="m-progress-text">
+                <span class="m-count">{{m4Current}} / {{m4Target}}</span>
+                <span class="m-remaining"><span class="num">{{m4Remaining}}</span>개 남음!</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">@kbo_data_<span class="neon">lab</span></span> &nbsp;⚾&nbsp; KBO</span>
+    </div>
+</div>
+
+</body>
+</html>

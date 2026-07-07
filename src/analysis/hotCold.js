@@ -59,11 +59,20 @@ function saveDailyBatters(todayBatters, dateStr) {
  * @param {Object} dailyData - loadDailyScores()의 반환값
  * @returns {{ hot: Array, cold: Array }} 각 Top 3
  */
-function getHotColdPlayers(dailyData) {
+function getHotColdPlayers(dailyData, seasonHitters = []) {
     const dates = Object.keys(dailyData).sort();
     if (dates.length < 2) {
         console.warn('⚠️ 핫/콜드 분석에 최소 2일 이상의 데이터가 필요합니다.');
         return { hot: [], cold: [] };
+    }
+
+    // 시즌 타율 맵 생성
+    const seasonAvgMap = {};
+    for (const p of seasonHitters) {
+        if (p.playerName) {
+            // hitterHra가 보통 0.325 같은 숫자 포맷
+            seasonAvgMap[`${p.playerName}_${p.teamName}`] = Number(p.hitterHra) || 0;
+        }
     }
 
     // 선수별 7일 누적 타수/안타 집계
@@ -79,10 +88,6 @@ function getHotColdPlayers(dailyData) {
                     playerCode: p.playerCode,
                     totalAb: 0,
                     totalHit: 0,
-                    recentAb: 0,  // 최근 3일
-                    recentHit: 0,
-                    earlyAb: 0,   // 이전 기간
-                    earlyHit: 0,
                     games: 0,
                 };
             }
@@ -92,42 +97,19 @@ function getHotColdPlayers(dailyData) {
         }
     }
 
-    // 최근 3일과 이전 기간 분리
-    const recentDates = dates.slice(-3);
-    const earlyDates = dates.slice(0, -3);
-
-    for (const date of recentDates) {
-        for (const p of dailyData[date]) {
-            const key = `${p.playerName}_${p.teamName}`;
-            if (playerMap[key]) {
-                playerMap[key].recentAb += p.ab;
-                playerMap[key].recentHit += p.hit;
-            }
-        }
-    }
-
-    for (const date of earlyDates) {
-        for (const p of dailyData[date]) {
-            const key = `${p.playerName}_${p.teamName}`;
-            if (playerMap[key]) {
-                playerMap[key].earlyAb += p.ab;
-                playerMap[key].earlyHit += p.hit;
-            }
-        }
-    }
-
-    // 타율 변동 계산 (최소 타석 기준 적용)
+    // 타율 변동 계산 (최근 7일 최소 8타수 이상 기준)
     const players = Object.values(playerMap)
-        .filter(p => p.totalAb >= 10 && p.recentAb >= 3 && p.earlyAb >= 3) // 최소 타석 기준
+        .filter(p => p.totalAb >= 8) 
         .map(p => {
-            const recentAvg = p.recentHit / p.recentAb;
-            const earlyAvg = p.earlyHit / p.earlyAb;
-            const totalAvg = p.totalHit / p.totalAb;
-            const delta = recentAvg - earlyAvg;
+            const key = `${p.playerName}_${p.teamName}`;
+            const weeklyAvg = p.totalHit / p.totalAb;
+            const seasonAvg = seasonAvgMap[key] !== undefined ? seasonAvgMap[key] : weeklyAvg; // 폴백
+            const delta = weeklyAvg - seasonAvg;
+            
             return {
                 ...p,
-                avg: totalAvg.toFixed(3),
-                recentAvg: recentAvg.toFixed(3),
+                avg: weeklyAvg.toFixed(3),
+                recentAvg: weeklyAvg.toFixed(3), // 템플릿의 x1Avg 변수에 매핑됨
                 delta: delta,
                 deltaStr: delta >= 0 ? `▲${Math.abs(delta).toFixed(3)}` : `▼${Math.abs(delta).toFixed(3)}`,
                 imageUrl: p.playerCode
@@ -136,10 +118,25 @@ function getHotColdPlayers(dailyData) {
             };
         });
 
-    // HOT: delta 내림차순 Top 3
-    const hot = [...players].sort((a, b) => b.delta - a.delta).slice(0, 3);
-    // COLD: delta 오름차순 Top 3
-    const cold = [...players].sort((a, b) => a.delta - b.delta).slice(0, 3);
+    // HOT: 최근 7일 타율이 높은 순 정렬
+    const hot = [...players]
+        .sort((a, b) => {
+            // 타율 높은 순 -> 같으면 delta 큰 순
+            const avgDiff = Number(b.recentAvg) - Number(a.recentAvg);
+            if (Math.abs(avgDiff) > 0.0001) return avgDiff;
+            return b.delta - a.delta;
+        })
+        .slice(0, 3);
+
+    // COLD: 최근 7일 타율이 낮은 순 정렬
+    const cold = [...players]
+        .sort((a, b) => {
+            // 타율 낮은 순 -> 같으면 delta 작은 순 (더 많이 떨어진 순)
+            const avgDiff = Number(a.recentAvg) - Number(b.recentAvg);
+            if (Math.abs(avgDiff) > 0.0001) return avgDiff;
+            return a.delta - b.delta;
+        })
+        .slice(0, 3);
 
     return { hot, cold };
 }

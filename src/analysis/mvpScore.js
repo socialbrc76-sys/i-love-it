@@ -37,9 +37,10 @@ function calculateScore(playerStats, isWinningTeam = false) {
 /**
  * 모든 경기의 타자 데이터를 받아 그날의 MVP(Top 1)와 순위를 반환합니다.
  * @param {Array} gamesRecordData - 일정 API와 박스스코어 API를 조합한 일일 게임 기록 배열
+ * @param {Object} playerTeamMap - 선수별 소속팀 매핑 데이터
  * @returns {Object} 오늘의 MVP 선수 정보 및 스코어
  */
-function getDailyMVP(gamesRecordData) {
+function getDailyMVP(gamesRecordData, playerTeamMap = {}) {
     let allPlayers = [];
     
     for (const game of gamesRecordData) {
@@ -57,11 +58,17 @@ function getDailyMVP(gamesRecordData) {
              for (const batter of batters) {
                  if(batter.ab > 0 || batter.bb > 0) { // 타석에 선 경우
                     const score = calculateScore(batter, isWinningTeam);
+                    
+                    // 1순위: playerCode 기반 팀명 매핑, 2순위: 선수 이름 기반 팀명 매핑, 3순위: 경기 정보 기반 폴백
+                    const lookupKey1 = `${batter.playerCode || batter.playerId}`;
+                    const lookupKey2 = `${batter.name}`;
+                    const realTeamName = playerTeamMap[lookupKey1] || playerTeamMap[lookupKey2] || gameInfo[`${teamType}TeamName`];
+                    
                     allPlayers.push({
                          ...batter,
                          playerName: batter.name,
                          pa: (batter.ab || 0) + (batter.bb || 0),
-                         teamName: gameInfo[`${teamType}TeamName`],
+                         teamName: realTeamName,
                          mvpScore: score
                      });
                  }

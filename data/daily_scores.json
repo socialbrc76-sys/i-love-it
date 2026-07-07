@@ -530,7 +530,7 @@
     },
     {
       "playerName": "박건우",
-      "teamName": "롯데",
+      "teamName": "NC",
       "playerCode": "55509",
       "ab": 3,
       "hit": 2,
@@ -1852,7 +1852,7 @@
     },
     {
       "playerName": "박건우",
-      "teamName": "롯데",
+      "teamName": "NC",
       "playerCode": "55509",
       "ab": 2,
       "hit": 0,
@@ -7089,7 +7089,7 @@
       "playerName": "문현빈",
       "teamName": "한화",
       "playerCode": "53764",
-      "ab": 4,
+      "ab": 5,
       "hit": 0,
       "hr": 0,
       "rbi": 1,
@@ -7108,10 +7108,21 @@
       "mvpScore": 0
     },
     {
+      "playerName": "황영묵",
+      "teamName": "한화",
+      "playerCode": "54795",
+      "ab": 1,
+      "hit": 1,
+      "hr": 0,
+      "rbi": 1,
+      "bb": 0,
+      "mvpScore": 0
+    },
+    {
       "playerName": "노시환",
       "teamName": "한화",
       "playerCode": "69737",
-      "ab": 3,
+      "ab": 4,
       "hit": 1,
       "hr": 0,
       "rbi": 1,
@@ -7527,7 +7538,7 @@
     },
     {
       "playerName": "박건우",
-      "teamName": "롯데",
+      "teamName": "NC",
       "playerCode": "55509",
       "ab": 1,
       "hit": 0,

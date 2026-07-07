@@ -95,16 +95,32 @@ async function runPipeline() {
             process.exit(0);
         }
 
-        // ── 2단계: MVP 분석 + 시즌 누적 스탯 ──
-        console.log(`[2] Analyzing Data (MVP, Rankings, Season Stats)...`);
-        const mvpData = getDailyMVP(gamesRecordData);
-        
+        // ── 2단계: 시즌 누적 스탯 로드 및 팀명 매핑 테이블 빌드 ──
+        console.log(`[2] Fetching Season Rankings & Building Team Map...`);
         const seasonYear = dateDash.substring(0, 4);
         const seasonHitters = await naverSportsAPI.getHitterRanking(seasonYear);
         const topBatters = getTopBatters(seasonHitters);
 
         const seasonPitchers = await naverSportsAPI.getPitcherRanking(seasonYear);
         const topPitchers = getTopPitchers(seasonPitchers);
+
+        // KBO 전체 선수 공식 소속팀명 매핑 테이블 구축 (홈/어웨이 API 꼬임 대응)
+        const playerTeamMap = {};
+        for (const p of seasonHitters) {
+            if (p.playerName) {
+                playerTeamMap[p.playerId] = p.teamName;
+                playerTeamMap[p.playerName] = p.teamName;
+            }
+        }
+        for (const p of seasonPitchers) {
+            if (p.playerName) {
+                playerTeamMap[p.playerId] = p.teamName;
+                playerTeamMap[p.playerName] = p.teamName;
+            }
+        }
+
+        console.log(`[2-1] Analyzing MVP Data...`);
+        const mvpData = getDailyMVP(gamesRecordData, playerTeamMap);
 
         // ── 3단계: 시즌 MVP 레이스 갱신 ──
         console.log(`[3] Updating Season MVP Race & Daily Scores...`);
@@ -120,10 +136,14 @@ async function runPipeline() {
                 const batters = (recordData.battersBoxscore && recordData.battersBoxscore[teamType]) || [];
                 for (const batter of batters) {
                     if (batter.ab > 0 || batter.bb > 0) {
+                        const lookupKey1 = `${batter.playerCode || batter.playerId}`;
+                        const lookupKey2 = `${batter.name}`;
+                        const realTeamName = playerTeamMap[lookupKey1] || playerTeamMap[lookupKey2] || gameInfo[`${teamType}TeamName`];
+
                         allBatters.push({
                             ...batter,
                             playerName: batter.name,
-                            teamName: gameInfo[`${teamType}TeamName`],
+                            teamName: realTeamName,
                             mvpScore: mvpData.top5.find(p => p.playerName === batter.name)?.mvpScore || 0,
                         });
                     }
@@ -134,7 +154,7 @@ async function runPipeline() {
 
         // ── 4단계: 니치 분석 (핫/콜드, 주간 MVP, 마일스톤) ──
         console.log(`[4] Running Niche Analytics (Hot/Cold, Weekly MVP, Milestones)...`);
-        const hotCold = getHotColdPlayers(dailyData);
+        const hotCold = getHotColdPlayers(dailyData, seasonHitters);
         const weeklyMvpLeaders = getWeeklyMvpLeaders();
         const milestones = detectMilestones(seasonHitters, seasonPitchers);
 

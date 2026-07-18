@@ -21,6 +21,13 @@
     "playerCode": "68050"
   },
   {
+    "playerName": "안재석",
+    "teamName": "두산",
+    "mvpScore": 23.5,
+    "date": "2026-07-18",
+    "playerCode": "51203"
+  },
+  {
     "playerName": "최재훈",
     "teamName": "한화",
     "mvpScore": 21,
@@ -61,12 +68,5 @@
     "mvpScore": 19.5,
     "date": "2026-04-02",
     "playerCode": "78548"
-  },
-  {
-    "playerName": "이재현",
-    "teamName": "삼성",
-    "mvpScore": 19.5,
-    "date": "2026-05-14",
-    "playerCode": "52415"
   }
 ]

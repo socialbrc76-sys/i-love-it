@@ -35,6 +35,13 @@
     "playerCode": "78288"
   },
   {
+    "playerName": "카스트로",
+    "teamName": "KIA",
+    "mvpScore": 21,
+    "date": "2026-08-26",
+    "playerCode": "56626"
+  },
+  {
     "playerName": "최주환",
     "teamName": "키움",
     "mvpScore": 20.5,
@@ -61,12 +68,5 @@
     "mvpScore": 20,
     "date": "2026-06-20",
     "playerCode": "54730"
-  },
-  {
-    "playerName": "고승민",
-    "teamName": "롯데",
-    "mvpScore": 20,
-    "date": "2026-08-21",
-    "playerCode": "69517"
   }
 ]
